@@ -62,7 +62,7 @@ available banks from the list `SHA1, SHA256, SHA384`.
 ./tpm2-totp generate
 ./tpm2-totp -P verysecret generate
 ./tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 generate
-./tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate #TODO to be implemented
+./tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
 ```
 
 ## Boot
