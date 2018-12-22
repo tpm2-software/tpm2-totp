@@ -1,14 +1,18 @@
 /* SPDX-License-Identifier: BSD-3 */
 /*******************************************************************************
  * Copyright 2018, Fraunhofer SIT
+ * Copyright 2018, Jonas Witschel
  * All rights reserved.
  *******************************************************************************/
+
+#define _GNU_SOURCE
 
 #include <tpm2-totp.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <getopt.h>
 #include <qrencode.h>
@@ -23,18 +27,22 @@ char *help =
     "Usage: [options] {generate|calculate|reseal|recover|clean}\n"
     "Options:\n"
     "    -h, --help      print help\n"
+    "    -b, --banks     Selected PCR banks (default: SHA1,SHA256,SHA384)\n"
     "    -N, --nvindex   TPM NV index to store data (default: 0x018094AF)\n"
     "    -P, --password  Password for recovery/resealing (default: None)\n"
+    "    -p, --pcrs      Selected PCR registers (default: 0,2,4,6)\n"
     "    -t, --time      Show the time used for calculation\n"
     "    -v, --verbose   print verbose messages\n"
     "\n";
 
-static const char *optstr = "hN:P:tv";
+static const char *optstr = "hb:N:P:p:tv";
 
 static const struct option long_options[] = {
     {"help",     no_argument,       0, 'h'},
+    {"banks",    required_argument, 0, 'b'},
     {"nvindex",  required_argument, 0, 'N'},
     {"password", required_argument, 0, 'P'},
+    {"pcrs",     required_argument, 0, 'p'},
     {"time",     no_argument,       0, 't'},
     {"verbose",  no_argument,       0, 'v'},
     {0,          0,                 0,  0 }
@@ -42,11 +50,69 @@ static const struct option long_options[] = {
 
 static struct opt {
     enum { CMD_NONE, CMD_GENERATE, CMD_CALCULATE, CMD_RESEAL, CMD_RECOVER, CMD_CLEAN } cmd;
+    int banks;
     int nvindex;
     char *password;
+    int pcrs;
     int time;
     int verbose;
 } opt;
+
+int
+parse_banks(char *str, int *banks)
+{
+    char *token;
+    char *saveptr;
+
+    *banks = 0;
+
+    token = strtok_r(str, ",", &saveptr);
+    if (!token) {
+        return -1;
+    }
+    while (token) {
+        if (strcmp(token, "SHA1") == 0) {
+            *banks |= TPM2TOTP_BANK_SHA1;
+        } else if (strcmp(token, "SHA256") == 0) {
+            *banks |= TPM2TOTP_BANK_SHA256;
+        } else if (strcmp(token, "SHA384") == 0) {
+            *banks |= TPM2TOTP_BANK_SHA384;
+        } else {
+            return -1;
+        }
+        token = strtok_r(NULL, ",", &saveptr);
+    }
+
+    return 0;
+}
+
+int
+parse_pcrs(char *str, int *pcrs)
+{
+    char *token;
+    char *saveptr;
+    char *endptr;
+    long pcr;
+
+    *pcrs = 0;
+
+    token = strtok_r(str, ",", &saveptr);
+    if (!token) {
+        return -1;
+    }
+    while (token) {
+        errno = 0;
+        pcr = strtoul(token, &endptr, 0);
+        if (errno || endptr == token || *endptr != '\0') {
+            return -1;
+        } else {
+            *pcrs |= 1 << pcr;
+        }
+        token = strtok_r(NULL, ",", &saveptr);
+    }
+
+    return 0;
+}
 
 /** Parse and set command line options.
  *
@@ -62,8 +128,10 @@ parse_opts(int argc, char **argv)
 {
     /* set the default values */
     opt.cmd = CMD_NONE;
+    opt.banks = 0;
     opt.nvindex = 0;
     opt.password = NULL;
+    opt.pcrs = 0;
     opt.time = 0;
     opt.verbose = 0;
 
@@ -76,6 +144,12 @@ parse_opts(int argc, char **argv)
         case 'h':
             printf("%s", help);
             exit(0);
+        case 'b':
+            if (parse_banks(optarg, &opt.banks) != 0) {
+                ERR("Error parsing banks.\n");
+                exit(1);
+            }
+            break;
         case 'N':
             if (sscanf(optarg, "0x%x", &opt.nvindex) != 1
                 && sscanf(optarg, "%i", &opt.nvindex) != 1) {
@@ -85,6 +159,12 @@ parse_opts(int argc, char **argv)
             break;
         case 'P':
             opt.password = optarg;
+            break;
+        case 'p':
+            if (parse_pcrs(optarg, &opt.pcrs) != 0) {
+                ERR("Error parsing pcrs.\n");
+                exit(1);
+            }
             break;
         case 't':
             opt.time = 1;
@@ -227,7 +307,7 @@ main(int argc, char **argv)
 
     switch(opt.cmd) {
     case CMD_GENERATE:
-        rc = tpm2totp_generateKey(0x00, 0x00, opt.password,
+        rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password,
                                   &secret, &secret_size, 
                                   &keyBlob, &keyBlob_size);
         chkrc(rc, exit(1));
