@@ -29,9 +29,10 @@ char *help =
     "    -v, --verbose   print verbose messages\n"
     "\n";
 
-static const char *optstr = "N:P:tv";
+static const char *optstr = "hN:P:tv";
 
 static const struct option long_options[] = {
+    {"help",     no_argument,       0, 'h'},
     {"nvindex",  required_argument, 0, 'N'},
     {"password", required_argument, 0, 'P'},
     {"time",     no_argument,       0, 't'},
@@ -75,7 +76,7 @@ parse_opts(int argc, char **argv)
         case 'h':
             printf("%s", help);
             exit(0);
-        case 'e':
+        case 'N':
             if (sscanf(optarg, "0x%x", &opt.nvindex) != 1
                 && sscanf(optarg, "%i", &opt.nvindex) != 1) {
                 ERR("Error parsing nvindex.\n");
