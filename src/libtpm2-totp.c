@@ -89,17 +89,17 @@ TPML_PCR_SELECTION allCreationPCR = { .count = 0 };
 
 TPM2B_AUTH emptyAuth = { .size = 0, };
 
-/** Generate a key
+/** Generate a key.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param secret [out]
- * @param secret_size [out]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] pcrs PCRs the key should be sealed against.
+ * @param[in] banks PCR banks the key should be sealed against.
+ * @param[in] password Optional password to recover or reseal the secret.
+ * @param[out] secret Generated secret.
+ * @param[out] secret_size Size of the secret.
+ * @param[out] keyBlob Generated key.
+ * @param[out] keyBlob_size Size of the generated key.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
  */
 int
 tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
@@ -299,15 +299,18 @@ error:
     return (rc)? (int)rc : -1;
 }
 
-/** Generate a key
+/** Reseal a key to new PCR values.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] keyBlob Original key.
+ * @param[in] keyBlob_size Size of the key.
+ * @param[in] password Password of the key.
+ * @param[in] pcrs PCRs the key should be sealed against.
+ * @param[in] banks PCR banks the key should be sealed against.
+ * @param[out] newBlob New key.
+ * @param[out] newBlob_size Size of the new key.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
+ * @retval -10 on empty password.
  */
 int
 tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
@@ -524,15 +527,13 @@ error:
     return (rc)? (int)rc : -1;
 }
 
-/** Generate a key
+/** Store a key in a NV index.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] keyblob Key to store to NVRAM.
+ * @param[in] keyblob_size Size of the key.
+ * @param[in] nv NV index to store the key.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
  */
 int
 tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv)
@@ -594,15 +595,13 @@ error:
     return (rc)? (int)rc : -1;
 }
 
-/** Generate a key
+/** Load a key from a NV index.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] nv NV index of the key.
+ * @param[out] keyBlob Loaded key.
+ * @param[out] keyBlob_size Size of the key.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
  */
 int
 tpm2totp_loadKey_nv(uint32_t nv, uint8_t **keyBlob, size_t *keyBlob_size)
@@ -653,15 +652,11 @@ error:
 }
 
 
-/** Generate a key
+/** Delete a key from a NV index.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] nv NV index to delete.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
  */
 int
 tpm2totp_deleteKey_nv(uint32_t nv)
@@ -698,15 +693,14 @@ error:
     return (rc)? (int)rc : -1;
 }
 
-/** Generate a key
+/** Calculate a time-based one-time password for a key.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] keyBlob Key to generate the TOTP.
+ * @param[in] keyBlob_size Size of the key.
+ * @param[out] nowp Current time.
+ * @param[out] otp Calculated TOTP.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
  */
 int
 tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
@@ -851,16 +845,16 @@ error:
     return (rc)? (int)rc : -1;
 }
 
-/** Generate a key
+/** Recover a secret from a key.
  *
- * Helper function to generate a key.
- * @param pcrs [in]
- * @param banks [in]
- * @param password [in]
- * @param keyblob [out]
- * @param keyblob_size [out]
- * @retval 0 on success
- * @retval -1 on undefined/general failure
+ * @param[in] keyBlob Key to recover the secret from.
+ * @param[in] keyBlob_size Size of the key.
+ * @param[in] password Password of the key.
+ * @param[out] secret Recovered secret.
+ * @param[out] secret_size Size of the secret.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
+ * @retval -10 on empty password.
  */
 int
 tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size, 
