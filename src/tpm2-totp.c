@@ -346,8 +346,8 @@ main(int argc, char **argv)
         rc = tpm2totp_loadKey_nv(opt.nvindex, &keyBlob, &keyBlob_size);
         chkrc(rc, exit(1));
 
-        rc = tpm2totp_reseal(keyBlob, keyBlob_size, opt.password, 0x00, 0x00,
-                             &newBlob, &newBlob_size);
+        rc = tpm2totp_reseal(keyBlob, keyBlob_size, opt.password, opt.pcrs,
+                             opt.banks, &newBlob, &newBlob_size);
         free(keyBlob);
         chkrc(rc, exit(1));
 
