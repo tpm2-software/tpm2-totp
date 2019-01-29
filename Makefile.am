@@ -4,7 +4,7 @@
 
 ### Initialize global variables used throughout the file ###
 INCLUDE_DIRS    = -I$(srcdir)/include -I$(srcdir)/src
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 --install
 AM_CFLAGS       = $(INCLUDE_DIRS) $(EXTRA_CFLAGS) $(TSS2_ESYS_CFLAGS) \
                   $(QRENCODE_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 AM_LDFLAGS      = $(EXTRA_LDFLAGS) $(CODE_COVERAGE_LIBS)
