@@ -59,6 +59,10 @@ AX_ADD_LINK_FLAG([-Wl,-z,now])
 AX_ADD_LINK_FLAG([-Wl,-z,relro])
 
 AX_CODE_COVERAGE
+m4_ifdef([_AX_CODE_COVERAGE_RULES],
+         [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [true])],
+         [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [false])])
+AX_ADD_AM_MACRO_STATIC([])
 
 AC_ARG_ENABLE([debug],
             [AS_HELP_STRING([--enable-debug],
