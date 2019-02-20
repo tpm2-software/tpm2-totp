@@ -83,6 +83,13 @@ AS_IF([test -z "$PANDOC"],
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
 AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
+AC_ARG_ENABLE([integration],
+            [AS_HELP_STRING([--enable-integration],
+                            [build integration tests against TPM (default is no)])],
+            [enable_integration=$enableval],
+            [enable_integration=no])
+AM_CONDITIONAL([INTEGRATION], [test "x$enable_integration" != xno])
+
 AC_OUTPUT
 
 AC_MSG_RESULT([

@@ -105,7 +105,7 @@ script:
     else
       export SCAN_PREFIX="scan-build --status-bugs"
     fi
-  - $SCAN_PREFIX ../configure $CONFIGURE_OPTIONS
+  - $SCAN_PREFIX ../configure $CONFIGURE_OPTIONS --enable-integration
   - $SCAN_PREFIX make -j$(nproc)
   - make -j1 check
   - cat test-suite.log
