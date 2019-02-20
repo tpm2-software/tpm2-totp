@@ -13,6 +13,7 @@ AM_LDADD        = $(TSS2_ESYS_LIBS) $(QRENCODE_LIBS) -ldl
 # Initialize empty variables to be extended throughout
 bin_PROGRAMS =
 noinst_PROGRAMS =
+check_PROGRAMS =
 include_HEADERS =
 lib_LTLIBRARIES =
 noinst_LTLIBRARIES =
@@ -42,17 +43,23 @@ tpm2_totp_LDADD = $(AM_LDADD) libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
 ### Tests ###
-TESTS = test/libtpm2-totp.sh \
-        test/tpm2-totp.sh
-EXTRA_DIST += $(TESTS)
+TESTS =
 
-noinst_PROGRAMS += libtpm2-totp
+if INTEGRATION
+TESTS += $(TESTS_SHELL)
+endif #INTEGRATION
+TESTS_SHELL = test/libtpm2-totp.sh \
+              test/tpm2-totp.sh
+EXTRA_DIST += $(TESTS_SHELL)
+
+if INTEGRATION
+check_PROGRAMS += libtpm2-totp
 
 libtpm2_totp_SOURCES = test/libtpm2-totp.c
 libtpm2_totp_CFLAGS = $(AM_CFLAGS) $(OATH_CFLAGS)
 libtpm2_totp_LDADD = $(AM_LDADD) $(OATH_LIBS) libtpm2-totp.la
 libtpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(OATH_LDFLAGS)
-
+endif #INTEGRATION
 
 # Adding user and developer information
 EXTRA_DIST += \
