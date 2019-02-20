@@ -82,6 +82,13 @@ AS_IF([test -z "$PANDOC"],
     [AC_MSG_WARN([Required executable pandoc not found, man pages will not be built])])
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
 
+AC_ARG_ENABLE([integration],
+            [AS_HELP_STRING([--enable-integration],
+                            [build integration tests against TPM (default is no)])],
+            [enable_integration=$enableval],
+            [enable_integration=no])
+AM_CONDITIONAL([INTEGRATION], [test "x$enable_integration" != xno])
+
 AC_OUTPUT
 
 AC_MSG_RESULT([
