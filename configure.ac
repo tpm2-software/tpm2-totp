@@ -5,8 +5,8 @@
 AC_PREREQ([2.68])
 
 AC_INIT([tpm2-totp],
-        [0.0.1],
-        [https://github.com/tpm2-software/tpm2-totp],
+        [0.1.0-rc0],
+        [https://github.com/tpm2-software/tpm2-totp/issues],
         [],
         [https://github.com/tpm2-software/tpm2-totp])
 dnl Avoid setting CFLAGS to anything by default; we use AC_CFLAGS below for this.
