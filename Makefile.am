@@ -75,10 +75,13 @@ AUTHORS:
 EXTRA_DIST += AUTHORS
 CLEANFILES += AUTHORS
 
-if HAVE_PANDOC
+if HAVE_MAN_PAGES
 ### Man Pages
 man1_MANS = \
-    man/tpm2-totp.1
+    man/man1/tpm2-totp.1
+endif
+
+if HAVE_PANDOC
 # If pandoc is enabled, we want to generate the manpages for the dist tarball
 EXTRA_DIST += \
     $(man1_MANS)
@@ -91,15 +94,11 @@ dist-hook:
 	@exit 1
 endif
 
-define man_dir
-    mkdir man 2>/dev/null || test -d man
-endef
+man/man1/%.1: man/%.1.md
+	$(AM_V_GEN)mkdir -p man/man1 && cat $< | $(PANDOC) -s -t man >$@
 
-man/%.1: man/%.1.md
-	$(AM_V_GEN)$(call man_dir) && cat $< | $(PANDOC) -s -t man >$@
-
-man/%.3: man/%.3.md
-	$(AM_V_GEN)$(call man_dir) && cat $< | $(PANDOC) -s -t man >$@
+man/man3/%.3: man/%.3.md
+	$(AM_V_GEN)mkdir -p man/man3 && cat $< | $(PANDOC) -s -t man >$@
 
 EXTRA_DIST += \
     man/tpm2-totp.1.md

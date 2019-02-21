@@ -81,6 +81,7 @@ AC_PATH_PROG([PANDOC], [pandoc])
 AS_IF([test -z "$PANDOC"],
     [AC_MSG_WARN([Required executable pandoc not found, man pages will not be built])])
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
+AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
 AC_OUTPUT
 
