@@ -24,12 +24,12 @@ function prereq()
 {
     if [ -f NVChip ]; then
         echo "There is a leftover file NVChip in the test directory."
-        return 99 #XFAIL
+        return 99 #ERROR
     fi
 
     if killall -0 $(basename $TPMSIM); then
         echo "There is already a tpm_simulator running."
-        return 99 #XFAIL
+        return 99 #ERROR
     fi
 
     trap "cleanup" EXIT

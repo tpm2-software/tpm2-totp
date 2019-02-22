@@ -75,7 +75,6 @@ AS_IF([test "x$enable_debug" != "xno"],
 PKG_PROG_PKG_CONFIG([0.25])
 PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
 PKG_CHECK_MODULES([QRENCODE],[libqrencode])
-PKG_CHECK_MODULES([OATH],[liboath])
 
 AC_PATH_PROG([PANDOC], [pandoc])
 AS_IF([test -z "$PANDOC"],
@@ -89,6 +88,7 @@ AC_ARG_ENABLE([integration],
             [enable_integration=$enableval],
             [enable_integration=no])
 AM_CONDITIONAL([INTEGRATION], [test "x$enable_integration" != xno])
+AS_IF([test "x$enable_integration" != xno], [PKG_CHECK_MODULES([OATH],[liboath])])
 
 AC_OUTPUT
 
