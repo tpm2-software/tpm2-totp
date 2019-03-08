@@ -36,7 +36,6 @@ lib_LTLIBRARIES += libtpm2-totp.la
 include_HEADERS += include/tpm2-totp.h
 
 libtpm2_totp_la_SOURCES = src/libtpm2-totp.c
-libtpm2_totp_la_CFLAGS = $(AM_CFLAGS)
 libtpm2_totp_la_LIBADD = $(AM_LDADD)
 libtpm2_totp_la_LDFLAGS = $(AM_LDFLAGS) '(tpm2_totp)'
 
@@ -44,7 +43,6 @@ libtpm2_totp_la_LDFLAGS = $(AM_LDFLAGS) '(tpm2_totp)'
 bin_PROGRAMS += tpm2-totp
 
 tpm2_totp_SOURCES = src/tpm2-totp.c
-tpm2_totp_CFLAGS = $(AM_CFLAGS)
 tpm2_totp_LDADD = $(AM_LDADD) libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
