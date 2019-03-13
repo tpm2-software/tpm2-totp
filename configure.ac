@@ -66,8 +66,7 @@ AX_ADD_AM_MACRO_STATIC([])
 
 AC_ARG_ENABLE([debug],
             [AS_HELP_STRING([--enable-debug],
-                            [build with debug output (default is no)])],
-            [enable_debug=$enableval],
+                            [build with debug output])],,
             [enable_debug=no])
 AS_IF([test "x$enable_debug" != "xno"],
       AC_DEFINE_UNQUOTED([DEBUG], [1], ["Debug output enabled"]))
@@ -84,8 +83,7 @@ AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
 AC_ARG_ENABLE([integration],
             [AS_HELP_STRING([--enable-integration],
-                            [build integration tests against TPM (default is no)])],
-            [enable_integration=$enableval],
+                            [build integration tests against TPM])],,
             [enable_integration=no])
 AM_CONDITIONAL([INTEGRATION], [test "x$enable_integration" != xno])
 AS_IF([test "x$enable_integration" != xno], [PKG_CHECK_MODULES([OATH],[liboath])])
