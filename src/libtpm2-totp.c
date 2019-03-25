@@ -22,7 +22,7 @@
 #define SECRETLEN 20
 
 #define DEFAULT_PCRS (0b000000000000000000010101)
-#define DEFAULT_BANKS (0b111)
+#define DEFAULT_BANKS (0b11)
 #define DEFAULT_NV 0x018094AF
 
 const TPM2B_DIGEST ownerauth = { .size = 0 };
