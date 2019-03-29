@@ -102,9 +102,6 @@ endif
 man/man1/%.1: man/%.1.md
 	$(AM_V_GEN)mkdir -p man/man1 && cat $< | $(PANDOC) -s -t man >$@
 
-man/man3/%.3: man/%.3.md
-	$(AM_V_GEN)mkdir -p man/man3 && cat $< | $(PANDOC) -s -t man >$@
-
 EXTRA_DIST += \
     man/tpm2-totp.1.md
 CLEANFILES += \
