@@ -3,13 +3,3 @@
 set -e
 
 autoreconf --install --sym
-
-if [ "$USER" = "afuchs" ]; then
-./configure \
-  --enable-debug \
-  PKG_CONFIG_PATH=$PWD/../INSTALLDIR/usr/local/lib/pkgconfig \
-  CFLAGS=-I$PWD/../INSTALLDIR/usr/local/include \
-  LDFLAGS=-L$PWD/../INSTALLDIR/usr/local/lib \
-#  --enable-debug
-make -j8
-fi
