@@ -169,7 +169,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
     if (rc != TPM2_RC_INITIALIZE) chkrc(rc, goto error);
 
     while (*secret_size < SECRETLEN) {
-        dbg("Calling Esys_GetRandom for %li bytes", SECRETLEN - *secret_size);
+        dbg("Calling Esys_GetRandom for %zu bytes", SECRETLEN - *secret_size);
         rc = Esys_GetRandom(ctx,
                             ESYS_TR_NONE, ESYS_TR_NONE, ESYS_TR_NONE,
                             SECRETLEN - *secret_size, &t);
