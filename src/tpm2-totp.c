@@ -5,8 +5,6 @@
  * All rights reserved.
  *******************************************************************************/
 
-#define _GNU_SOURCE
-
 #include <tpm2-totp.h>
 
 #include <stdio.h>
