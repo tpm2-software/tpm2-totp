@@ -305,12 +305,12 @@ main(int argc, char **argv)
 
     switch(opt.cmd) {
     case CMD_GENERATE:
-        rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password,
+        rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password, NULL,
                                   &secret, &secret_size, 
                                   &keyBlob, &keyBlob_size);
         chkrc(rc, exit(1));
 
-        rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, opt.nvindex);
+        rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, opt.nvindex, NULL);
         free(keyBlob);
         chkrc(rc, exit(1));
 
@@ -327,10 +327,10 @@ main(int argc, char **argv)
         free(url);
         break;
     case CMD_CALCULATE:
-        rc = tpm2totp_loadKey_nv(opt.nvindex, &keyBlob, &keyBlob_size);
+        rc = tpm2totp_loadKey_nv(opt.nvindex, NULL, &keyBlob, &keyBlob_size);
         chkrc(rc, exit(1));
 
-        rc = tpm2totp_calculate(keyBlob, keyBlob_size, &now, &totp);
+        rc = tpm2totp_calculate(keyBlob, keyBlob_size, NULL, &now, &totp);
         free(keyBlob);
         chkrc(rc, exit(1));
         if (opt.time) {
@@ -341,27 +341,27 @@ main(int argc, char **argv)
         printf("%s%06" PRIu64, timestr, totp);
         break;
     case CMD_RESEAL:
-        rc = tpm2totp_loadKey_nv(opt.nvindex, &keyBlob, &keyBlob_size);
+        rc = tpm2totp_loadKey_nv(opt.nvindex, NULL, &keyBlob, &keyBlob_size);
         chkrc(rc, exit(1));
 
         rc = tpm2totp_reseal(keyBlob, keyBlob_size, opt.password, opt.pcrs,
-                             opt.banks, &newBlob, &newBlob_size);
+                             opt.banks, NULL, &newBlob, &newBlob_size);
         free(keyBlob);
         chkrc(rc, exit(1));
 
         //TODO: Are your sure ?
-        rc = tpm2totp_deleteKey_nv(opt.nvindex);
+        rc = tpm2totp_deleteKey_nv(opt.nvindex, NULL);
         chkrc(rc, exit(1));
 
-        rc = tpm2totp_storeKey_nv(newBlob, newBlob_size, opt.nvindex);
+        rc = tpm2totp_storeKey_nv(newBlob, newBlob_size, opt.nvindex, NULL);
         free(newBlob);
         chkrc(rc, exit(1));
         break;
     case CMD_RECOVER:
-        rc = tpm2totp_loadKey_nv(opt.nvindex, &keyBlob, &keyBlob_size);
+        rc = tpm2totp_loadKey_nv(opt.nvindex, NULL, &keyBlob, &keyBlob_size);
         chkrc(rc, exit(1));
 
-        rc = tpm2totp_getSecret(keyBlob, keyBlob_size, opt.password,
+        rc = tpm2totp_getSecret(keyBlob, keyBlob_size, opt.password, NULL,
                                 &secret, &secret_size);
         free(keyBlob);
         chkrc(rc, exit(1));
@@ -380,7 +380,7 @@ main(int argc, char **argv)
         break;
     case CMD_CLEAN:
         //TODO: Are your sure ?
-        rc = tpm2totp_deleteKey_nv(opt.nvindex);
+        rc = tpm2totp_deleteKey_nv(opt.nvindex, NULL);
         chkrc(rc, exit(1));
         break;
     default:
