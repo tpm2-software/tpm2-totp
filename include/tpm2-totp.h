@@ -17,30 +17,35 @@
 
 int
 tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
+                     TSS2_TCTI_CONTEXT *tcti_context,
                      uint8_t **secret, size_t *secret_size,
                      uint8_t **keyBlob, size_t *keyBlob_size);
 
 int
 tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
                 const char *password, uint32_t pcrs, uint32_t banks,
+                TSS2_TCTI_CONTEXT *tcti_context,
                 uint8_t **newBlob, size_t *newBlob_size);
 
 int
-tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv);
+tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv,
+                     TSS2_TCTI_CONTEXT *tcti_context);
 
 int
-tpm2totp_loadKey_nv(uint32_t nv, uint8_t **keyBlob, size_t *keyBlob_size);
+tpm2totp_loadKey_nv(uint32_t nv, TSS2_TCTI_CONTEXT *tcti_context,
+                    uint8_t **keyBlob, size_t *keyBlob_size);
 
 int
-tpm2totp_deleteKey_nv(uint32_t nv);
+tpm2totp_deleteKey_nv(uint32_t nv, TSS2_TCTI_CONTEXT *tcti_context);
 
 int
 tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
+                   TSS2_TCTI_CONTEXT *tcti_context,
                    time_t *now, uint64_t *otp);
 
 int
 tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size, 
-                   const char *password,
+                   const char *password, TSS2_TCTI_CONTEXT *tcti_context,
                    uint8_t **secret, size_t *secret_size);
 
 #endif /* TPM2_TOTP_H */

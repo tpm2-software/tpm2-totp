@@ -29,11 +29,11 @@ main(int argc, char **argv)
 
 /**********/
 
-    rc = tpm2totp_generateKey(0x00, 0x00, PWD,
+    rc = tpm2totp_generateKey(0x00, 0x00, PWD, NULL,
                               &secret, &secret_size, &keyBlob, &keyBlob_size);
     chkrc(rc, exit(1));
 
-    rc = tpm2totp_calculate(keyBlob, keyBlob_size, &now, &totp);
+    rc = tpm2totp_calculate(keyBlob, keyBlob_size, NULL, &now, &totp);
     chkrc(rc, exit(1));
     snprintf(&totp_string[0], 7, "%.*ld", 6, totp);
 
@@ -47,10 +47,10 @@ main(int argc, char **argv)
 
 /**********/
 
-    rc = tpm2totp_reseal(keyBlob, keyBlob_size, PWD, 0, 0, &newBlob, &newBlob_size);
+    rc = tpm2totp_reseal(keyBlob, keyBlob_size, PWD, 0, 0, NULL, &newBlob, &newBlob_size);
     chkrc(rc, exit(1));
 
-    rc = tpm2totp_calculate(newBlob, newBlob_size, &now, &totp);
+    rc = tpm2totp_calculate(newBlob, newBlob_size, NULL, &now, &totp);
     chkrc(rc, exit(1));
     snprintf(&totp_string[0], 7, "%.*ld", 6, totp);
 
@@ -65,26 +65,26 @@ main(int argc, char **argv)
 
 /**********/
 
-    rc = tpm2totp_getSecret(keyBlob, keyBlob_size, PWD,
+    rc = tpm2totp_getSecret(keyBlob, keyBlob_size, PWD, NULL,
                             &secret, &secret_size);
     chkrc(rc, exit(1));
 
 /**********/
 
-    rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, 0);
+    rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, 0, NULL);
     chkrc(rc, exit(1));
 
     free(keyBlob);
-    rc = tpm2totp_loadKey_nv(0, &keyBlob, &keyBlob_size);
+    rc = tpm2totp_loadKey_nv(0, NULL, &keyBlob, &keyBlob_size);
     chkrc(rc, exit(1));
 
-    rc = tpm2totp_deleteKey_nv(0);
+    rc = tpm2totp_deleteKey_nv(0, NULL);
     chkrc(rc, exit(1));
 
-    rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, 0);
+    rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, 0, NULL);
     chkrc(rc, exit(1));
 
-    rc = tpm2totp_deleteKey_nv(0);
+    rc = tpm2totp_deleteKey_nv(0, NULL);
     chkrc(rc, exit(1));
 
 /***********/

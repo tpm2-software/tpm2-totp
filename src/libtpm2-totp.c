@@ -94,6 +94,7 @@ TPM2B_AUTH emptyAuth = { .size = 0, };
  * @param[in] pcrs PCRs the key should be sealed against.
  * @param[in] banks PCR banks the key should be sealed against.
  * @param[in] password Optional password to recover or reseal the secret.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @param[out] secret Generated secret.
  * @param[out] secret_size Size of the secret.
  * @param[out] keyBlob Generated key.
@@ -103,6 +104,7 @@ TPM2B_AUTH emptyAuth = { .size = 0, };
  */
 int
 tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
+                     TSS2_TCTI_CONTEXT *tcti_context,
                      uint8_t **secret, size_t *secret_size,
                      uint8_t **keyBlob, size_t *keyBlob_size)
 {
@@ -162,7 +164,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
         return -1;
     }
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, goto error);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
@@ -306,6 +308,7 @@ error:
  * @param[in] password Password of the key.
  * @param[in] pcrs PCRs the key should be sealed against.
  * @param[in] banks PCR banks the key should be sealed against.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @param[out] newBlob New key.
  * @param[out] newBlob_size Size of the new key.
  * @retval 0 on success.
@@ -315,6 +318,7 @@ error:
 int
 tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
                 const char *password, uint32_t pcrs, uint32_t banks,
+                TSS2_TCTI_CONTEXT *tcti_context,
                 uint8_t **newBlob, size_t *newBlob_size)
 {
     if (keyBlob == NULL || !password || newBlob == NULL || newBlob_size == NULL) {
@@ -401,7 +405,7 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
         return -1;
     }
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, goto error);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
@@ -532,11 +536,13 @@ error:
  * @param[in] keyblob Key to store to NVRAM.
  * @param[in] keyblob_size Size of the key.
  * @param[in] nv NV index to store the key.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
  */
 int
-tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv)
+tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv,
+                     TSS2_TCTI_CONTEXT *tcti_context)
 {
     if (!keyBlob)
         return -1;
@@ -568,7 +574,7 @@ tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv)
     }
     memcpy(&blob.buffer[0], keyBlob, blob.size);
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, return rc);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
@@ -598,13 +604,15 @@ error:
 /** Load a key from a NV index.
  *
  * @param[in] nv NV index of the key.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @param[out] keyBlob Loaded key.
  * @param[out] keyBlob_size Size of the key.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
  */
 int
-tpm2totp_loadKey_nv(uint32_t nv, uint8_t **keyBlob, size_t *keyBlob_size)
+tpm2totp_loadKey_nv(uint32_t nv, TSS2_TCTI_CONTEXT *tcti_context,
+                    uint8_t **keyBlob, size_t *keyBlob_size)
 {
     TSS2_RC rc;
     ESYS_CONTEXT *ctx;
@@ -614,7 +622,7 @@ tpm2totp_loadKey_nv(uint32_t nv, uint8_t **keyBlob, size_t *keyBlob_size)
 
     if (!nv) nv = DEFAULT_NV; /* Some random handle from owner space */
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, return rc);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
@@ -655,11 +663,12 @@ error:
 /** Delete a key from a NV index.
  *
  * @param[in] nv NV index to delete.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
  */
 int
-tpm2totp_deleteKey_nv(uint32_t nv)
+tpm2totp_deleteKey_nv(uint32_t nv, TSS2_TCTI_CONTEXT *tcti_context)
 {
     TSS2_RC rc;
     ESYS_CONTEXT *ctx;
@@ -667,7 +676,7 @@ tpm2totp_deleteKey_nv(uint32_t nv)
 
     if (!nv) nv = DEFAULT_NV; /* Some random handle from owner space */
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, return rc);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
@@ -697,6 +706,7 @@ error:
  *
  * @param[in] keyBlob Key to generate the TOTP.
  * @param[in] keyBlob_size Size of the key.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @param[out] nowp Current time.
  * @param[out] otp Calculated TOTP.
  * @retval 0 on success.
@@ -704,6 +714,7 @@ error:
  */
 int
 tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
+                   TSS2_TCTI_CONTEXT *tcti_context,
                    time_t *nowp, uint64_t *otp)
 {
     if (keyBlob == NULL || otp == NULL) {
@@ -774,7 +785,7 @@ tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
         pcrsel.pcrSelections[i].pcrSelect[2] = pcrs >>16 & 0xff;
     }
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, goto error);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
@@ -850,6 +861,7 @@ error:
  * @param[in] keyBlob Key to recover the secret from.
  * @param[in] keyBlob_size Size of the key.
  * @param[in] password Password of the key.
+ * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @param[out] secret Recovered secret.
  * @param[out] secret_size Size of the secret.
  * @retval 0 on success.
@@ -858,7 +870,7 @@ error:
  */
 int
 tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size, 
-                   const char *password,
+                   const char *password, TSS2_TCTI_CONTEXT *tcti_context,
                    uint8_t **secret, size_t *secret_size)
 {
     if (keyBlob == NULL || !password || secret == NULL || secret_size == NULL) {
@@ -902,7 +914,7 @@ tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
         return -1;
     }
 
-    rc = Esys_Initialize(&ctx, NULL, NULL);
+    rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, goto error);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
