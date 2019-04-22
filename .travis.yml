@@ -98,9 +98,9 @@ script:
     fi
   - $SCAN_PREFIX ../configure $CONFIGURE_OPTIONS --enable-integration
   - $SCAN_PREFIX make -j$(nproc)
-  - make -j1 check
+  - make -j$(nproc) check
   - cat test-suite.log
-  - make -j1 distcheck
+  - make -j$(nproc) distcheck
   - cat config.log $(find -name test-suit.log) || true
   - popd
 
