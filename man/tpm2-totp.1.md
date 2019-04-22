@@ -24,23 +24,23 @@ options.
 
   * `generate`:
     Generate a new TOTP seret.
-    Possible options: `-b, -N, -p, -P`
+    Possible options: `-b`, `-N`, `-p`, `-P`, `-T`
 
   * `calculate`:
     Calculate a TOTP value.
-    Possible options: `-N, -t`
+    Possible options: `-N`, `-t`, `-T`
 
   * `reseal`:
     Reseal TOTP secret to new PCRs, banks or values.
-    Possible options: `-b, -N, -p, -P`(required)
+    Possible options: `-b`, `-N`, `-p`, `-P` (required), `-T`
 
   * `recover`:
     Recover the TOTP secret and display it again.
-    Possible Options: `-N, -P`(required)
+    Possible Options: `-N`, `-P` (required), `-T`
 
   * `clean`:
     Delete the consumed NV index.
-    Possible Options: `-N`
+    Possible Options: `-N`, `-T`
 
 ## OPTIONS
 
@@ -61,6 +61,17 @@ options.
 
   * `-t`, `--time`:
     Display the date/time of the TOTP calculation (commands: calculate)
+
+  * `-T <tcti-name>[:<tcti-config>]`, `--tcti <tcti-name>[:<tcti-config>]`:
+    Select the TCTI to use. The raw *tcti-name* is used to load a dynamic TCTI
+    interface using *dlopen(3)*. If present, the option config *tcti-config*
+    is passed verbatim to the the chosen TCTI.
+
+    The TCTI can additionally be specified using the environment variable
+    `TPM2TOTP_TCTI`. If both the command line option and the environment
+    variable are present, the command line option is used.
+
+    If no TCTI is specified, the default TCTI configured on the system is used.
 
   * `-v`, `--verbose`:
     Print verbose messages
@@ -113,6 +124,15 @@ used. By default, 0x018094AF is used and recommended.
 ./tpm2-totp -N 0x01800001 calculate
 ./tpm2-totp -N 0x01800001 -P verysecret recover
 ./tpm2-totp -N 0x01800001 -P verysecret reseal
+```
+
+## TCTI configuration
+All commands take the `-T` option or the `TPM2TOTP_TCTI` environment variable
+to specify the TCTI to be used. If the TCTI is not specified explicitly, the
+default TCTI configured on the system is used. To e.g. use the TPM simulator
+bound to a given port, use
+```
+./tpm2-totp -T libtss2-tcti-mssim.so.0:port=2321 Ygenerate
 ```
 
 # RETURNS
