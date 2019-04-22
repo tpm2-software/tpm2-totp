@@ -59,11 +59,14 @@ endif #INTEGRATION
 TESTS_SHELL = test/libtpm2-totp.sh \
               test/tpm2-totp.sh
 EXTRA_DIST += $(TESTS_SHELL)
+TEST_EXTENSIONS = .sh
+SH_LOG_COMPILER = $(srcdir)/test/sh_log_compiler.sh
+EXTRA_DIST += $(SH_LOG_COMPILER)
 
 if INTEGRATION
 check_PROGRAMS += libtpm2-totp
 
-libtpm2_totp_SOURCES = test/libtpm2-totp.c
+libtpm2_totp_SOURCES = test/libtpm2-totp.c src/tpm2-totp-tcti.c src/tpm2-totp-tcti.h
 libtpm2_totp_CFLAGS = $(AM_CFLAGS) $(OATH_CFLAGS)
 libtpm2_totp_LDADD = $(AM_LDADD) $(OATH_LIBS) libtpm2-totp.la
 libtpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(OATH_LDFLAGS)
