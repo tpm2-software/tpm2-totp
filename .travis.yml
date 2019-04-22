@@ -3,8 +3,7 @@ compiler:
   - gcc
   - clang
 
-sudo: false
-dist: trusty
+dist: xenial
 
 env:
   matrix:
@@ -24,6 +23,7 @@ addons:
     - build-essential
     - realpath
     - lcov
+    - libgcrypt20-dev
     - liboath-dev
     - libqrencode-dev
     - pandoc
@@ -43,15 +43,6 @@ install:
         make install DESTDIR=${PWD}/../installdir
     fi
   - which openssl
-  - popd
-# libcurl
-  - git clone --depth=1 -b curl-7_61_1 https://github.com/curl/curl.git
-  - pushd curl
-  - ./buildconf
-  - ./configure CFLAGS=-I${PWD}/../installdir/usr/local/include LDFLAGS=-L${PWD}/../installdir/usr/local/lib
-  - make -j$(nproc)
-  - make install DESTDIR=${PWD}/../installdir
-  - rm ${PWD}/../installdir/usr/local/lib/*.la
   - popd
 # TPM Simulator
   - wget --no-check-certificate https://download.01.org/tpm2/ibmtpm974.tar.gz
