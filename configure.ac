@@ -40,7 +40,9 @@ LT_INIT()
 
 AC_GNU_SOURCE
 
-AC_CONFIG_FILES([Makefile])
+PKG_INSTALLDIR()
+
+AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc])
 
 AX_ADD_COMPILER_FLAG([-std=c99])
 AX_ADD_COMPILER_FLAG([-Wall])
