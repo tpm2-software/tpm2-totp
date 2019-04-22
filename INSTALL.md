@@ -11,7 +11,12 @@
 * tpm2-tss >= 2.0
 * libqrencode
 * pandoc
-* liboath (for test-suit)
+
+For the integration test suite:
+* liboath
+* tpm_server
+* realpath
+* ss
 
 ## Ubuntu
 ```
@@ -26,7 +31,8 @@ sudo apt -y install \
   pkg-config \
   libqrencode-dev \
   pandoc \
-  liboath-dev
+  liboath-dev \
+  iproute2
 git clone --depth=1 http://www.github.com/tpm2-software/tpm2-tss
 cd tpm2-tss
 ./bootstrap
@@ -40,7 +46,7 @@ sudo make install
 ./bootstrap
 ./configure
 make -j$(nproc)
-make -j1 check
+make -j$(nproc) check
 sudo make install
 ```
 

@@ -90,7 +90,18 @@ AC_ARG_ENABLE([integration],
                             [build integration tests against TPM])],,
             [enable_integration=no])
 AM_CONDITIONAL([INTEGRATION], [test "x$enable_integration" != xno])
-AS_IF([test "x$enable_integration" != xno], [PKG_CHECK_MODULES([OATH],[liboath])])
+AS_IF([test "x$enable_integration" != xno],
+      [PKG_CHECK_MODULES([OATH],[liboath])
+       AC_CHECK_PROG([tpm_server], [tpm_server], [yes])
+       AS_IF([test "x$tpm_server" != xyes],
+             [AC_MSG_ERROR([Integration tests require the tpm_server executable])])
+       AC_CHECK_PROG([realpath], [realpath], [yes])
+       AS_IF([test "x$realpath" != xyes],
+             [AC_MSG_ERROR([Integration tests require the realpath executable])])
+       AC_CHECK_PROG([ss], [ss], [yes])
+       AS_IF([test "x$ss" != xyes],
+             [AC_MSG_ERROR([Integration tests require the ss executable])])
+      ])
 
 AC_OUTPUT
 
