@@ -15,6 +15,8 @@
 #include <getopt.h>
 #include <qrencode.h>
 
+#include "tpm2-totp-tcti.h"
+
 #define VERB(...) if (opt.verbose) fprintf(stderr, __VA_ARGS__)
 #define ERR(...) fprintf(stderr, __VA_ARGS__)
 
@@ -30,10 +32,11 @@ char *help =
     "    -P, --password  Password for recovery/resealing (default: None)\n"
     "    -p, --pcrs      Selected PCR registers (default: 0,2,4,6)\n"
     "    -t, --time      Show the time used for calculation\n"
+    "    -T, --tcti      TCTI to use\n"
     "    -v, --verbose   print verbose messages\n"
     "\n";
 
-static const char *optstr = "hb:N:P:p:tv";
+static const char *optstr = "hb:N:P:p:tT:v";
 
 static const struct option long_options[] = {
     {"help",     no_argument,       0, 'h'},
@@ -42,6 +45,7 @@ static const struct option long_options[] = {
     {"password", required_argument, 0, 'P'},
     {"pcrs",     required_argument, 0, 'p'},
     {"time",     no_argument,       0, 't'},
+    {"tcti",     required_argument, 0, 'T'},
     {"verbose",  no_argument,       0, 'v'},
     {0,          0,                 0,  0 }
 };
@@ -53,6 +57,7 @@ static struct opt {
     char *password;
     int pcrs;
     int time;
+    char *tcti;
     int verbose;
 } opt;
 
@@ -145,14 +150,14 @@ parse_opts(int argc, char **argv)
         case 'b':
             if (parse_banks(optarg, &opt.banks) != 0) {
                 ERR("Error parsing banks.\n");
-                exit(1);
+                return -1;
             }
             break;
         case 'N':
             if (sscanf(optarg, "0x%x", &opt.nvindex) != 1
                 && sscanf(optarg, "%i", &opt.nvindex) != 1) {
                 ERR("Error parsing nvindex.\n");
-                exit(1);
+                return -1;
             }
             break;
         case 'P':
@@ -161,11 +166,14 @@ parse_opts(int argc, char **argv)
         case 'p':
             if (parse_pcrs(optarg, &opt.pcrs) != 0) {
                 ERR("Error parsing pcrs.\n");
-                exit(1);
+                return -1;
             }
             break;
         case 't':
             opt.time = 1;
+            break;
+        case 'T':
+            opt.tcti = optarg;
             break;
         case 'v':
             opt.verbose = 1;
@@ -173,7 +181,7 @@ parse_opts(int argc, char **argv)
         default:
             ERR("Unknown option at index %i.\n\n", opt_idx);
             ERR("%s", help);
-            exit(1);
+            return -1;
         }
     }
 
@@ -181,7 +189,7 @@ parse_opts(int argc, char **argv)
     if (optind >= argc) {
         ERR("Missing command: generate, calculate, reseal, recover, clean.\n\n");
         ERR("%s", help);
-        exit(1);
+        return -1;
     }
     if (!strcmp(argv[optind], "generate")) {
         opt.cmd = CMD_GENERATE;
@@ -196,14 +204,14 @@ parse_opts(int argc, char **argv)
     } else {
         ERR("Unknown command: generate, calculate, reseal, recover, clean.\n\n");
         ERR("%s", help);
-        exit(1);
+        return -1;
     }        
     optind++;
 
     if (optind < argc) {
         ERR("Unknown argument provided.\n\n");
         ERR("%s", help);
-        exit(1);
+        return -1;
     }
     return 0;
 }
@@ -250,7 +258,7 @@ qrencode(const char *url)
 {
     QRcode *qrcode = QRcode_encodeString(url, 0/*=version*/, QR_ECLEVEL_L,
                                          QR_MODE_8, 1/*=case*/);
-    if (!qrcode) { ERR("QRcode failed."); exit(1); }
+    if (!qrcode) { ERR("QRcode failed."); return NULL; }
 
     char *qrpic = malloc(/* Margins top / bot*/ 2 * (
                             (qrcode->width+2) * 2 - 2 + 
@@ -292,8 +300,9 @@ qrencode(const char *url)
 int
 main(int argc, char **argv)
 {
-    if (parse_opts(argc, argv) != 0)
-        exit(1);
+    if (parse_opts(argc, argv) != 0) {
+        goto err;
+    }
 
     int rc;
     uint8_t *secret, *keyBlob, *newBlob;
@@ -303,16 +312,22 @@ main(int argc, char **argv)
     time_t now;
     char timestr[100] = { 0, };
 
+    TSS2_TCTI_CONTEXT *tcti_context;
+    if (tcti_init(opt.tcti, &tcti_context) != 0) {
+        goto err;
+    }
+
     switch(opt.cmd) {
     case CMD_GENERATE:
-        rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password, NULL,
+
+        rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password, tcti_context,
                                   &secret, &secret_size, 
                                   &keyBlob, &keyBlob_size);
-        chkrc(rc, exit(1));
+        chkrc(rc, goto err);
 
-        rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, opt.nvindex, NULL);
+        rc = tpm2totp_storeKey_nv(keyBlob, keyBlob_size, opt.nvindex, tcti_context);
         free(keyBlob);
-        chkrc(rc, exit(1));
+        chkrc(rc, goto err);
 
         base32key = base32enc(secret, secret_size);
         url = calloc(1, strlen(base32key) + strlen(URL_PREFIX) + 1);
@@ -320,6 +335,10 @@ main(int argc, char **argv)
         free(base32key);
 
         qrpic = qrencode(url);
+        if (!qrpic) {
+            free(url);
+            goto err;
+        }
 
         printf("%s\n", qrpic);
         printf("%s\n", url);
@@ -327,44 +346,46 @@ main(int argc, char **argv)
         free(url);
         break;
     case CMD_CALCULATE:
-        rc = tpm2totp_loadKey_nv(opt.nvindex, NULL, &keyBlob, &keyBlob_size);
-        chkrc(rc, exit(1));
+        rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context, &keyBlob, &keyBlob_size);
+        chkrc(rc, goto err);
 
-        rc = tpm2totp_calculate(keyBlob, keyBlob_size, NULL, &now, &totp);
+        rc = tpm2totp_calculate(keyBlob, keyBlob_size, tcti_context, &now, &totp);
         free(keyBlob);
-        chkrc(rc, exit(1));
+        chkrc(rc, goto err);
         if (opt.time) {
             rc = !strftime (timestr, sizeof(timestr)-1, "%Y-%m-%d %H:%M:%S: ",
                             localtime (&now));
-            chkrc(rc, exit(1));
+            chkrc(rc, goto err);
         }
         printf("%s%06" PRIu64, timestr, totp);
         break;
     case CMD_RESEAL:
-        rc = tpm2totp_loadKey_nv(opt.nvindex, NULL, &keyBlob, &keyBlob_size);
-        chkrc(rc, exit(1));
+        rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context, &keyBlob, &keyBlob_size);
+        chkrc(rc, goto err);
 
         rc = tpm2totp_reseal(keyBlob, keyBlob_size, opt.password, opt.pcrs,
-                             opt.banks, NULL, &newBlob, &newBlob_size);
+                             opt.banks, tcti_context, &newBlob, &newBlob_size);
         free(keyBlob);
-        chkrc(rc, exit(1));
+        chkrc(rc, goto err);
 
         //TODO: Are your sure ?
-        rc = tpm2totp_deleteKey_nv(opt.nvindex, NULL);
-        chkrc(rc, exit(1));
+        rc = tpm2totp_deleteKey_nv(opt.nvindex, tcti_context);
+        chkrc(rc, goto err);
 
-        rc = tpm2totp_storeKey_nv(newBlob, newBlob_size, opt.nvindex, NULL);
+        rc = tpm2totp_storeKey_nv(newBlob, newBlob_size, opt.nvindex,
+                                  tcti_context);
         free(newBlob);
-        chkrc(rc, exit(1));
+        chkrc(rc, goto err);
         break;
     case CMD_RECOVER:
-        rc = tpm2totp_loadKey_nv(opt.nvindex, NULL, &keyBlob, &keyBlob_size);
-        chkrc(rc, exit(1));
+        rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context,
+                                 &keyBlob, &keyBlob_size);
+        chkrc(rc, goto err);
 
-        rc = tpm2totp_getSecret(keyBlob, keyBlob_size, opt.password, NULL,
+        rc = tpm2totp_getSecret(keyBlob, keyBlob_size, opt.password, tcti_context,
                                 &secret, &secret_size);
         free(keyBlob);
-        chkrc(rc, exit(1));
+        chkrc(rc, goto err);
 
         base32key = base32enc(secret, secret_size);
         url = calloc(1, strlen(base32key) + strlen(URL_PREFIX) + 1);
@@ -380,12 +401,17 @@ main(int argc, char **argv)
         break;
     case CMD_CLEAN:
         //TODO: Are your sure ?
-        rc = tpm2totp_deleteKey_nv(opt.nvindex, NULL);
-        chkrc(rc, exit(1));
+        rc = tpm2totp_deleteKey_nv(opt.nvindex, tcti_context);
+        chkrc(rc, goto err);
         break;
     default:
-        exit(1);
+        goto err;
     }
 
+    tcti_finalize();
     return 0;
+
+err:
+    tcti_finalize();
+    return 1;
 }

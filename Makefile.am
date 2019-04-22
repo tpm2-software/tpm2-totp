@@ -46,7 +46,7 @@ DISTCLEANFILES += $(pkgconfig_DATA)
 ### Executable ###
 bin_PROGRAMS += tpm2-totp
 
-tpm2_totp_SOURCES = src/tpm2-totp.c
+tpm2_totp_SOURCES = src/tpm2-totp.c src/tpm2-totp-tcti.c src/tpm2-totp-tcti.h
 tpm2_totp_LDADD = $(AM_LDADD) libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
