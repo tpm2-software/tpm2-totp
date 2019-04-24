@@ -91,6 +91,15 @@ plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(PLY_BOOT_CLIENT_LI
 plymouth_tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 endif # HAVE_PLYMOUTH
 
+if GTK
+bin_PROGRAMS += gtpm2-totp
+
+gtpm2_totp_SOURCES = src/gtpm2-totp.c src/gtpm2-totp.ui
+gtpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(QRENCODE_CFLAGS) $(GTK_CFLAGS)
+gtpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(QRENCODE_LIBS) $(GTK_LIBS) -ldl libtpm2-totp.la
+gtpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(GTK_LDFLAGS)
+endif #GTK
+
 ### Tests ###
 TESTS =
 
