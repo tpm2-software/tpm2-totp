@@ -40,5 +40,6 @@ man/man7/
 *~
 /libtpm2-totp
 /tpm2-totp
+/plymouth-tpm2-totp
 /AUTHORS
 /*.tar.gz

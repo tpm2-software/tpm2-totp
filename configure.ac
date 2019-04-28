@@ -85,6 +85,19 @@ AS_IF([test -z "$PANDOC"],
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
 AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
+AC_ARG_ENABLE([plymouth],
+              AS_HELP_STRING([--disable-plymouth], [Disable plymouth support]))
+AS_IF([test "x$enable_plymouth" != "xno"],
+      [PKG_CHECK_MODULES([PLY_BOOT_CLIENT], [ply-boot-client],
+                         [have_plymouth=yes], [have_plymouth=no])],
+      [have_plymouth=no])
+AM_CONDITIONAL([PLYMOUTH], [test "x$have_plymouth" = "xyes"])
+AS_IF([test "x$have_plymouth" = "xyes"],,
+      [AS_IF([test "x$enable_plymouth" = "xyes"],
+             [AC_MSG_ERROR([plymouth requested but not found])
+      ])
+])
+
 AC_ARG_ENABLE([integration],
             [AS_HELP_STRING([--enable-integration],
                             [build integration tests against TPM])],,
@@ -120,5 +133,6 @@ AC_MSG_RESULT([
 $PACKAGE_NAME $VERSION
     man-pages:  $PANDOC
     mkinitcpio: $with_mkinitcpiodir
+    plymouth:   $have_plymouth
 ])
     
