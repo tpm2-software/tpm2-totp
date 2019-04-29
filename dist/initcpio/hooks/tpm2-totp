@@ -1,0 +1,13 @@
+#!/usr/bin/ash
+
+run_hook() {
+    echo 'Verify the TOTP (press any key to continue):'
+    TSS2_LOG=esys+error tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
+    echo
+    while ! read -n 1 -r -s -t 10; do
+        TSS2_LOG=esys+error tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
+        echo
+    done
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
