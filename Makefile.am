@@ -134,5 +134,12 @@ CLEANFILES += \
 if HAVE_MKINITCPIO
 initcpio_install_DATA = dist/initcpio/install/tpm2-totp
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
+if PLYMOUTH
+initcpio_install_DATA += dist/initcpio/install/plymouth-tpm2-totp
+initcpio_hooks_DATA += dist/initcpio/hooks/plymouth-tpm2-totp
+endif # PLYMOUTH
 endif # HAVE_MKINITCPIO
-EXTRA_DIST += dist/initcpio/install/tpm2-totp dist/initcpio/hooks/tpm2-totp
+EXTRA_DIST += \
+	dist/initcpio/install/tpm2-totp \
+	dist/initcpio/hooks/tpm2-totp \
+	dist/initcpio/hooks/plymouth-tpm2-totp
