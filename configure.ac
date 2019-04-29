@@ -42,7 +42,10 @@ LT_INIT()
 
 PKG_INSTALLDIR()
 
-AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc])
+AX_RECURSIVE_EVAL([$libexecdir], [LIBEXECDIR])
+AC_SUBST([LIBEXECDIR])
+
+AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc dist/initcpio/install/plymouth-tpm2-totp])
 
 AX_ADD_COMPILER_FLAG([-std=c99])
 AX_ADD_COMPILER_FLAG([-Wall])

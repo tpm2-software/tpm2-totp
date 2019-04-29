@@ -13,6 +13,7 @@ config.sub
 configure
 depcomp
 dist/*.pc
+dist/initcpio/install/plymouth-tpm2-totp
 install-sh
 libtool
 ltmain.sh
