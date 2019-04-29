@@ -116,3 +116,9 @@ EXTRA_DIST += \
     man/tpm2-totp.1.md
 CLEANFILES += \
     $(man1_MANS)
+
+if HAVE_MKINITCPIO
+initcpio_install_DATA = dist/initcpio/install/tpm2-totp
+initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
+endif # HAVE_MKINITCPIO
+EXTRA_DIST += dist/initcpio/install/tpm2-totp dist/initcpio/hooks/tpm2-totp
