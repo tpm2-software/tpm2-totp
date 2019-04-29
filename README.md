@@ -8,7 +8,7 @@ This is a reimplementation of Matthew Garrett's
 purpose is to attest the trustworthiness of a device against a human using
 time-based one-time passwords (TOTP), facilitating the Trusted Platform Module
 (TPM) to bind the TOTP secret to the known trustworthy system state. In
-addition to the original tpmtotp, given the new capabilities of in-TPM hmac
+addition to the original tpmtotp, given the new capabilities of in-TPM HMAC
 calculation, the tpm2-totp's secret HMAC keys do not have to be exported from
 the TPM to the CPU's RAM on boot anymore. Another addition is the ability to
 rebind an old secret to the current PCRs in case a software component was
@@ -103,7 +103,7 @@ tpm2-totp -N 0x01800001 -P verysecret reseal
 
 # Limitations
 Whilst tpm2-totp provided the added security (in comparison to tpm-totp) that
-the key will not leave the TPM during the caluclate operation, the timesource
+the key will not leave the TPM during the calculate operation, the time source
 is still not trustworthy and thus an attacker might in some situations be able
 to generate a set of TOTP values for the future. Depending on the size of the
 possible attack window this can be very large though.
@@ -111,6 +111,6 @@ possible attack window this can be very large though.
 It is not yet possible to specify specific PCR values independent of the
 currently set PCR values. This would allow disabling the password-less calculate
 operation after booting the device. This makes most sense, once a TSS2 FAPI
-is available that will enable an interface to a cannonical PCR event log.
+is available that will enable an interface to a canonical PCR event log.
 
 Currently, an empty owner password is assumed.
