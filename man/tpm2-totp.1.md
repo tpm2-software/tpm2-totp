@@ -84,10 +84,10 @@ set a password `-P`in order to enable recovery options. Also the PCRs and PCR
 banks can be selected `-p` and `-b`. Default values are PCRs `0,2,4` and all
 available banks from the list `SHA1, SHA256, SHA384`.
 ```
-./tpm2-totp generate
-./tpm2-totp -P verysecret generate
-./tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 generate
-./tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
+tpm2-totp generate
+tpm2-totp -P verysecret generate
+tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 generate
+tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
 ```
 
 ## Boot
@@ -95,35 +95,35 @@ During boot the TOTP value for the current time, together with the current time
 should be shown to the user, eg using plymouth from mkinitrd or from dracut.
 The command to be executed is:
 ```
-./tpm2-totp calculate
-./tpm2-totp -t calculate
+tpm2-totp calculate
+tpm2-totp -t calculate
 ```
 
 ## Recovery
 In order to recover the QR code:
 ```
-./tpm2-totp -P verysecret recover
+tpm2-totp -P verysecret recover
 ```
 In order to reseal the secret:
 ```
-./tpm2-totp -P verysecret reseal
-./tpm2-totp -P verysecret -p 1,3,5,6 reseal
+tpm2-totp -P verysecret reseal
+tpm2-totp -P verysecret -p 1,3,5,6 reseal
 ```
 
 ## Deletion
 In order to delete the created NV index:
 ```
-./tpm2-totp clean
+tpm2-totp clean
 ```
 
 ## NV index
 All command additionally take the `-N` option to specify the NV index to be
 used. By default, 0x018094AF is used and recommended.
 ```
-./tpm2-totp -N 0x01800001 -P verysecret generate
-./tpm2-totp -N 0x01800001 calculate
-./tpm2-totp -N 0x01800001 -P verysecret recover
-./tpm2-totp -N 0x01800001 -P verysecret reseal
+tpm2-totp -N 0x01800001 -P verysecret generate
+tpm2-totp -N 0x01800001 calculate
+tpm2-totp -N 0x01800001 -P verysecret recover
+tpm2-totp -N 0x01800001 -P verysecret reseal
 ```
 
 ## TCTI configuration
@@ -132,7 +132,7 @@ to specify the TCTI to be used. If the TCTI is not specified explicitly, the
 default TCTI configured on the system is used. To e.g. use the TPM simulator
 bound to a given port, use
 ```
-./tpm2-totp -T libtss2-tcti-mssim.so.0:port=2321 Ygenerate
+tpm2-totp -T libtss2-tcti-mssim.so.0:port=2321 Ygenerate
 ```
 
 # RETURNS
