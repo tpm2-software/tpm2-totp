@@ -23,7 +23,7 @@ options.
 ## COMMANDS
 
   * `generate`:
-    Generate a new TOTP seret.
+    Generate a new TOTP secret.
     Possible options: `-b`, `-N`, `-p`, `-P`, `-T`
 
   * `calculate`:
@@ -65,7 +65,7 @@ options.
   * `-T <tcti-name>[:<tcti-config>]`, `--tcti <tcti-name>[:<tcti-config>]`:
     Select the TCTI to use. The raw *tcti-name* is used to load a dynamic TCTI
     interface using *dlopen(3)*. If present, the option config *tcti-config*
-    is passed verbatim to the the chosen TCTI.
+    is passed verbatim to the chosen TCTI.
 
     The TCTI can additionally be specified using the environment variable
     `TPM2TOTP_TCTI`. If both the command line option and the environment
@@ -92,7 +92,7 @@ tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
 
 ## Boot
 During boot the TOTP value for the current time, together with the current time
-should be shown to the user, eg using plymouth from mkinitrd or from dracut.
+should be shown to the user, e.g. using plymouth from mkinitrd or from dracut.
 The command to be executed is:
 ```
 tpm2-totp calculate
@@ -132,7 +132,7 @@ to specify the TCTI to be used. If the TCTI is not specified explicitly, the
 default TCTI configured on the system is used. To e.g. use the TPM simulator
 bound to a given port, use
 ```
-tpm2-totp -T libtss2-tcti-mssim.so.0:port=2321 Ygenerate
+tpm2-totp -T libtss2-tcti-mssim.so.0:port=2321 generate
 ```
 
 # RETURNS
