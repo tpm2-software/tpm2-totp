@@ -3,27 +3,7 @@
 # All rights reserved.
 #!/bin/bash
 
-echo "TPM tests"
-
-set -eEuf
-
-LANG=C
-PS4='$LINENO:'
-
-#Some debug options:
-set -x
-
-export TSS2_LOG=all+none
-#export TSS2_LOG=esys+trace
-
-PWD1="abc"
-
-function error()
-{
-    echo "FAILED"
-}
-
-trap "error" ERR
+set -eufx
 
 tpm2-totp -P abc -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
 
