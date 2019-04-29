@@ -27,6 +27,9 @@ addons:
     - liboath-dev
     - libqrencode-dev
     - pandoc
+    - libplymouth-dev
+    - plymouth
+    - fakeroot
 
 install:
   - git clean -xdf
@@ -96,7 +99,7 @@ script:
     else
       export SCAN_PREFIX="scan-build --status-bugs"
     fi
-  - $SCAN_PREFIX ../configure $CONFIGURE_OPTIONS --enable-integration
+  - $SCAN_PREFIX ../configure $CONFIGURE_OPTIONS --enable-integration --enable-plymouth
   - $SCAN_PREFIX make -j$(nproc)
   - make -j$(nproc) check
   - cat test-suite.log

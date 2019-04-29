@@ -114,6 +114,21 @@ AS_IF([test "x$enable_integration" != xno],
        AC_CHECK_PROG([ss], [ss], [yes])
        AS_IF([test "x$ss" != xyes],
              [AC_MSG_ERROR([Integration tests require the ss executable])])
+
+       AS_IF([test "x$have_plymouth" = "xyes"],
+             [AC_CHECK_PROG([plymouthd], [plymouthd], [yes])
+              AS_IF([test "x$plymouthd" != xyes],
+                    [AC_MSG_ERROR([Integration tests require the plymouthd executable])])
+              AC_CHECK_PROG([fakeroot], [fakeroot], [yes])
+              AS_IF([test "x$fakeroot" != xyes],
+                    [AC_MSG_WARN([Executable fakeroot not found, integration tests must be run as root])])
+              AC_CHECK_PROG([pgrep], [pgrep], [yes])
+              AS_IF([test "x$pgrep" != xyes],
+                    [AC_MSG_ERROR([Integration tests require the pgrep executable])])
+              AC_CHECK_PROG([timeout], [timeout], [yes])
+              AS_IF([test "x$timeout" != xyes],
+                    [AC_MSG_ERROR([Integration tests require the timeout executable])])
+             ])
       ])
 
 AC_ARG_WITH([mkinitcpiodir],
