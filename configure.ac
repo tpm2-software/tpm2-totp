@@ -33,12 +33,12 @@ AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Wno-portability])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])]) 
 AM_MAINTAINER_MODE([enable])
 
+AC_USE_SYSTEM_EXTENSIONS
+
 AC_PROG_CC
 AC_PROG_CC_C99
 AM_PROG_CC_C_O
 LT_INIT()
-
-AC_GNU_SOURCE
 
 PKG_INSTALLDIR()
 
