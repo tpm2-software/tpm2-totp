@@ -101,7 +101,7 @@ script:
   - make -j$(nproc) check
   - cat test-suite.log
   - make -j$(nproc) distcheck
-  - cat config.log $(find -name test-suit.log) || true
+  - cat tpm2-totp-*/_build/sub/test-suite.log config.log || true
   - popd
 
 after_success:
