@@ -65,14 +65,19 @@ TESTS =
 if INTEGRATION
 TESTS += $(TESTS_SHELL)
 
+if HAVE_MKINITCPIO
+TESTS += $(TESTS_MKINITCPIO)
+endif # HAVE_MKINITCPIO
+
 if PLYMOUTH
 TESTS += $(TESTS_PLYMOUTH)
 endif # PLYMOUTH
 endif #INTEGRATION
 TESTS_SHELL = test/libtpm2-totp.sh \
               test/tpm2-totp.sh
+TESTS_MKINITCPIO = test/mkinitcpio-tpm2-totp.sh
 TESTS_PLYMOUTH = test/plymouth-tpm2-totp.sh
-EXTRA_DIST += $(TESTS_SHELL) $(TESTS_PLYMOUTH)
+EXTRA_DIST += $(TESTS_SHELL) $(TESTS_MKINITCPIO) $(TESTS_PLYMOUTH)
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(srcdir)/test/sh_log_compiler.sh
 EXTRA_DIST += $(SH_LOG_COMPILER)
