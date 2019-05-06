@@ -88,6 +88,17 @@ AS_IF([test -z "$PANDOC"],
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
 AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
+AC_ARG_WITH([mkinitcpiodir],
+            AS_HELP_STRING([--with-mkinitcpiodir=DIR], [directory for mkinitcpio hooks]))
+AC_CHECK_PROG([mkinitcpio], [mkinitcpio], [yes])
+AS_IF([test "x$mkinitcpio" = xyes -a -z "$with_mkinitcpiodir"],
+      [with_mkinitcpiodir=$sysconfdir/initcpio])
+AS_IF([test "x$with_mkinitcpiodir" != xno],
+      [AC_SUBST([initcpio_installdir], [$with_mkinitcpiodir/install])
+       AC_SUBST([initcpio_hooksdir], [$with_mkinitcpiodir/hooks])
+      ])
+AM_CONDITIONAL(HAVE_MKINITCPIO, [test -n "$with_mkinitcpiodir" -a "x$with_mkinitcpiodir" != xno])
+
 AC_ARG_ENABLE([plymouth],
               AS_HELP_STRING([--disable-plymouth], [Disable plymouth support]))
 AS_IF([test "x$enable_plymouth" != "xno"],
@@ -132,18 +143,12 @@ AS_IF([test "x$enable_integration" != xno],
               AS_IF([test "x$timeout" != xyes],
                     [AC_MSG_ERROR([Integration tests require the timeout executable])])
              ])
-      ])
 
-AC_ARG_WITH([mkinitcpiodir],
-            AS_HELP_STRING([--with-mkinitcpiodir=DIR], [directory for mkinitcpio hooks]))
-AC_CHECK_PROG([mkinitcpio], [mkinitcpio], [yes])
-AS_IF([test "x$mkinitcpio" = xyes -a -z "$with_mkinitcpiodir"],
-      [with_mkinitcpiodir=$sysconfdir/initcpio])
-AS_IF([test "x$with_mkinitcpiodir" != xno],
-      [AC_SUBST([initcpio_installdir], [$with_mkinitcpiodir/install])
-       AC_SUBST([initcpio_hooksdir], [$with_mkinitcpiodir/hooks])
+       AM_COND_IF([HAVE_MKINITCPIO],
+                  [AS_IF([test "x$mkinitcpio" != xyes],
+                         [AC_MSG_ERROR([Integration tests require mkinitcpio to be installed])])
+                  ])
       ])
-AM_CONDITIONAL(HAVE_MKINITCPIO, [test -n "$with_mkinitcpiodir" -a "x$with_mkinitcpiodir" != xno])
 
 AC_OUTPUT
 
