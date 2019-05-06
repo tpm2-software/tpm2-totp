@@ -1,7 +1,7 @@
+#!/bin/bash
 # SPDX-License-Identifier: BSD-3
 # Copyright (c) 2019 Jonas Witschel
 # All rights reserved.
-#!/bin/bash
 
 export LANG=C
 export PATH="$PWD:$PATH"
