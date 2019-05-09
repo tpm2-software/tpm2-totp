@@ -5,6 +5,8 @@ compiler:
 
 dist: xenial
 
+cache: ccache
+
 env:
   global:
   - PATH="${PWD}/installdir/usr/local/bin:${PATH}"
