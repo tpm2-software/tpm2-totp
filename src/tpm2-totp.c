@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: BSD-3 */
+/* SPDX-License-Identifier: BSD-3-Clause */
 /*******************************************************************************
  * Copyright 2018, Fraunhofer SIT
  * Copyright 2018, Jonas Witschel
