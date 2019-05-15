@@ -76,7 +76,7 @@ install:
   - git clone --depth=1 https://github.com/tpm2-software/tpm2-tools.git
   - pushd tpm2-tools
   - mkdir m4 || true
-  - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
+  - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 ../autoconf-archive-2017.09.28/m4/ax_is_release.m4 m4/
   - ./bootstrap
   # Some workarounds for tpm2-tools with -Wno-XXX
   - ./configure --disable-hardening CFLAGS="-I${PWD}/../installdir/usr/local/include -Wno-unused-value -Wno-missing-field-initializer" LDFLAGS=-L${PWD}/../installdir/usr/local/lib
