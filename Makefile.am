@@ -6,9 +6,9 @@
 INCLUDE_DIRS    = -I$(srcdir)/include -I$(srcdir)/src
 ACLOCAL_AMFLAGS = -I m4 --install
 AM_CFLAGS       = $(INCLUDE_DIRS) $(EXTRA_CFLAGS) $(TSS2_ESYS_CFLAGS) \
-                  $(QRENCODE_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+                  $(CODE_COVERAGE_CFLAGS)
 AM_LDFLAGS      = $(EXTRA_LDFLAGS) $(CODE_COVERAGE_LIBS)
-AM_LDADD        = $(TSS2_ESYS_LIBS) $(QRENCODE_LIBS) -ldl
+AM_LDADD        = $(TSS2_ESYS_LIBS)
 
 # Initialize empty variables to be extended throughout
 bin_PROGRAMS =
@@ -48,15 +48,16 @@ DISTCLEANFILES += $(pkgconfig_DATA)
 bin_PROGRAMS += tpm2-totp
 
 tpm2_totp_SOURCES = src/tpm2-totp.c src/tpm2-totp-tcti.c
-tpm2_totp_LDADD = $(AM_LDADD) libtpm2-totp.la
+tpm2_totp_CFLAGS = $(AM_CFLAGS) $(QRENCODE_CFLAGS)
+tpm2_totp_LDADD = $(AM_LDADD) $(QRENCODE_LIBS) -ldl libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
 if PLYMOUTH
 libexec_PROGRAMS += plymouth-tpm2-totp
 plymouth_tpm2_totp_SOURCES = src/plymouth-tpm2-totp.c src/tpm2-totp-tcti.c
 plymouth_tpm2_totp_CFLAGS = $(AM_CFLAGS) $(PLY_BOOT_CLIENT_CFLAGS)
-plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(PLY_BOOT_CLIENT_LIBS) libtpm2-totp.la
-plymouth_tpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(PLY_BOOT_CLIENT_LDFLAGS)
+plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(PLY_BOOT_CLIENT_LIBS) -ldl libtpm2-totp.la
+plymouth_tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 endif # PLYMOUTH
 
 ### Tests ###
@@ -87,7 +88,7 @@ check_PROGRAMS += libtpm2-totp
 
 libtpm2_totp_SOURCES = test/libtpm2-totp.c src/tpm2-totp-tcti.c src/tpm2-totp-tcti.h
 libtpm2_totp_CFLAGS = $(AM_CFLAGS) $(OATH_CFLAGS)
-libtpm2_totp_LDADD = $(AM_LDADD) $(OATH_LIBS) libtpm2-totp.la
+libtpm2_totp_LDADD = $(AM_LDADD) $(OATH_LIBS) -ldl libtpm2-totp.la
 libtpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(OATH_LDFLAGS)
 endif #INTEGRATION
 
