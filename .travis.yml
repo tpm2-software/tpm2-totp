@@ -106,6 +106,8 @@ script:
   - make -j$(nproc) distcheck
   - cat tpm2-totp-*/_build/sub/test-suite.log config.log || true
   - popd
+# Check for whitespace errors
+  - git diff --check $(git hash-object -t tree /dev/null)
 
 after_success:
   - |
