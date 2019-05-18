@@ -7,7 +7,7 @@
 #include <tpm2-totp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
 #include <liboath/oath.h>
 
 #include "tpm2-totp-tcti.h"

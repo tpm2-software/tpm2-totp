@@ -47,13 +47,13 @@ DISTCLEANFILES += $(pkgconfig_DATA)
 ### Executable ###
 bin_PROGRAMS += tpm2-totp
 
-tpm2_totp_SOURCES = src/tpm2-totp.c src/tpm2-totp-tcti.c src/tpm2-totp-tcti.h
+tpm2_totp_SOURCES = src/tpm2-totp.c src/tpm2-totp-tcti.c
 tpm2_totp_LDADD = $(AM_LDADD) libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
 if PLYMOUTH
 libexec_PROGRAMS += plymouth-tpm2-totp
-plymouth_tpm2_totp_SOURCES = src/plymouth-tpm2-totp.c src/tpm2-totp-tcti.c src/tpm2-totp-tcti.h
+plymouth_tpm2_totp_SOURCES = src/plymouth-tpm2-totp.c src/tpm2-totp-tcti.c
 plymouth_tpm2_totp_CFLAGS = $(AM_CFLAGS) $(PLY_BOOT_CLIENT_CFLAGS)
 plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(PLY_BOOT_CLIENT_LIBS) libtpm2-totp.la
 plymouth_tpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(PLY_BOOT_CLIENT_LDFLAGS)
