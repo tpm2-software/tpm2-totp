@@ -66,7 +66,7 @@ In order to link against a developer version of tpm2-tss (not installed):
 ./configure \
   PKG_CONFIG_PATH=${TPM2TSS}/lib:$PKG_CONFIG_PATH \
   CFLAGS=-I${TPM2TSS}/include \
-  LDFLAGS=-L${TPM2TSS}/src/tss2-{tcti,mu,sys,esys}/.libs 
+  LDFLAGS=-L${TPM2TSS}/src/tss2-{tcti,mu,sys,esys}/.libs
 ```
 
 # Post installation

@@ -30,7 +30,7 @@ AC_CANONICAL_SYSTEM
 
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Wno-portability])
 #Backward compatible setting of "silent-rules"
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])]) 
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE([enable])
 
 AC_USE_SYSTEM_EXTENSIONS
@@ -158,4 +158,3 @@ $PACKAGE_NAME $VERSION
     mkinitcpio: $with_mkinitcpiodir
     plymouth:   $have_plymouth
 ])
-    

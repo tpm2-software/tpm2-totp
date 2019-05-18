@@ -44,7 +44,7 @@ tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
                    time_t *now, uint64_t *otp);
 
 int
-tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size, 
+tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
                    const char *password, TSS2_TCTI_CONTEXT *tcti_context,
                    uint8_t **secret, size_t *secret_size);
 

@@ -205,7 +205,7 @@ parse_opts(int argc, char **argv)
         ERR("Unknown command: generate, calculate, reseal, recover, clean.\n\n");
         ERR("%s", help);
         return -1;
-    }        
+    }
     optind++;
 
     if (optind < argc) {
@@ -239,7 +239,7 @@ base32enc(const uint8_t *in, size_t in_size) {
         r[i++]  = in[j] >> 2 & 0x1F;
         r[i++]  = in[j] << 3 & 0x1F;
         if (++j >= in_size) break; else i--;
-        r[i++] |= in[j] >> 5 & 0x1F; 
+        r[i++] |= in[j] >> 5 & 0x1F;
         r[i++]  = in[j] & 0x1F;
         if (++j >= in_size) break;
     }
@@ -261,7 +261,7 @@ qrencode(const char *url)
     if (!qrcode) { ERR("QRcode failed."); return NULL; }
 
     char *qrpic = malloc(/* Margins top / bot*/ 2 * (
-                            (qrcode->width+2) * 2 - 2 + 
+                            (qrcode->width+2) * 2 - 2 +
                             strlen("\033[47m%*s\033[0m\n") ) +
                          /* lines */ qrcode->width * (
                             strlen("\033[47m  ") * (qrcode->width + 1) +
@@ -321,7 +321,7 @@ main(int argc, char **argv)
     case CMD_GENERATE:
 
         rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password, tcti_context,
-                                  &secret, &secret_size, 
+                                  &secret, &secret_size,
                                   &keyBlob, &keyBlob_size);
         chkrc(rc, goto err);
 
