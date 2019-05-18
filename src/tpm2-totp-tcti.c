@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dlfcn.h>
-#include <tss2/tss2_tcti.h>
 
 #define ERR(...) fprintf(stderr, __VA_ARGS__)
 

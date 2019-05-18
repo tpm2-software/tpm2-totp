@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <time.h>
-#include <tss2/tss2_esys.h>
+#include <tss2/tss2_tcti.h>
 
 #define TPM2TOTP_BANK_SHA1 (1 << 0)
 #define TPM2TOTP_BANK_SHA256 (1 << 1)
