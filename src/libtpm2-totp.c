@@ -108,7 +108,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
                      uint8_t **secret, size_t *secret_size,
                      uint8_t **keyBlob, size_t *keyBlob_size)
 {
-    if (secret == NULL || secret_size == NULL || 
+    if (secret == NULL || secret_size == NULL ||
         keyBlob == NULL || keyBlob_size == NULL) {
         return -1;
     }
@@ -183,7 +183,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
     }
 
     dbg("Calling Esys_CreatePrimary");
-    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER, 
+    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER,
                             ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                             &primarySensitive, &primaryPublic,
                             &allOutsideInfo, &allCreationPCR,
@@ -219,13 +219,13 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
     chkrc(rc, goto error);
 
     keyInPublicHmac.publicArea.authPolicy = *policyDigest;
-    free(policyDigest);    
+    free(policyDigest);
 
     keySensitive.sensitive.data.size = *secret_size;
     memcpy(&keySensitive.sensitive.data.buffer[0], &(*secret)[0],
            *secret_size);
 
-    rc = Esys_Create(ctx, primary, 
+    rc = Esys_Create(ctx, primary,
                      ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                      &keySensitive, &keyInPublicHmac,
                      &allOutsideInfo, &allCreationPCR,
@@ -238,7 +238,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
             memcpy(&keySensitive.sensitive.userAuth.buffer[0], password,
                    keySensitive.sensitive.userAuth.size);
 
-        rc = Esys_Create(ctx, primary, 
+        rc = Esys_Create(ctx, primary,
                          ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                          &keySensitive, &keyInPublicSeal,
                          &allOutsideInfo, &allCreationPCR,
@@ -267,7 +267,7 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
     chkrc(rc, goto error_marshall);
     rc = Tss2_MU_UINT32_Marshal(banks, *keyBlob, *keyBlob_size, &off);
     chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac, 
+    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac,
                                       *keyBlob, *keyBlob_size, &off);
     chkrc(rc, goto error_marshall);
     rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac,
@@ -396,7 +396,7 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off,
                                         &keyPublicSeal);
     chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off, 
+    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off,
                                          &keyPrivateSeal);
     chkrc(rc, goto error);
 
@@ -411,13 +411,13 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
     if (rc != TPM2_RC_INITIALIZE) chkrc(rc, goto error);
 
-    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER, 
+    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER,
                             ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                             &primarySensitive, &primaryPublic,
                             &allOutsideInfo, &allCreationPCR,
                             &primary, NULL, NULL, NULL, NULL);
     chkrc(rc, goto error);
-    
+
     rc = Esys_Load(ctx, primary,
                    ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                    &keyPrivateSeal, &keyPublicSeal,
@@ -461,14 +461,14 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     chkrc(rc, goto error);
 
     keyInPublicHmac.publicArea.authPolicy = *policyDigest;
-    free(policyDigest);    
+    free(policyDigest);
 
     keySensitive.sensitive.data.size = secret2b->size;
     memcpy(&keySensitive.sensitive.data.buffer[0], &secret2b->buffer[0],
            keySensitive.sensitive.data.size);
     free(secret2b);
 
-    rc = Esys_Create(ctx, primary, 
+    rc = Esys_Create(ctx, primary,
                      ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                      &keySensitive, &keyInPublicHmac,
                      &allOutsideInfo, &allCreationPCR,
@@ -496,7 +496,7 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     chkrc(rc, goto error_marshall);
     rc = Tss2_MU_UINT32_Marshal(banks, *newBlob, *newBlob_size, &off);
     chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac, 
+    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac,
                                       *newBlob, *newBlob_size, &off);
     chkrc(rc, goto error_marshall);
     rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac,
@@ -749,7 +749,7 @@ tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
     chkrc(rc, goto error);
     rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, &keyPublic);
     chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off, 
+    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off,
                                          &keyPrivate);
     chkrc(rc, goto error);
 
@@ -791,13 +791,13 @@ tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
     if (rc != TPM2_RC_INITIALIZE) chkrc(rc, goto error);
 
-    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER, 
+    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER,
                             ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                             &primarySensitive, &primaryPublic,
                             &allOutsideInfo, &allCreationPCR,
                             &primary, NULL, NULL, NULL, NULL);
     chkrc(rc, goto error);
-    
+
     rc = Esys_Load(ctx, primary,
                    ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                    &keyPrivate, &keyPublic,
@@ -869,7 +869,7 @@ error:
  * @retval -10 on empty password.
  */
 int
-tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size, 
+tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
                    const char *password, TSS2_TCTI_CONTEXT *tcti_context,
                    uint8_t **secret, size_t *secret_size)
 {
@@ -905,7 +905,7 @@ tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
 
     rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, &keyPublic);
     chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off, 
+    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off,
                                          &keyPrivate);
     chkrc(rc, goto error);
 
@@ -920,13 +920,13 @@ tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
     if (rc != TPM2_RC_INITIALIZE) chkrc(rc, goto error);
 
-    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER, 
+    rc = Esys_CreatePrimary(ctx, ESYS_TR_RH_OWNER,
                             ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                             &primarySensitive, &primaryPublic,
                             &allOutsideInfo, &allCreationPCR,
                             &primary, NULL, NULL, NULL, NULL);
     chkrc(rc, goto error);
-    
+
     rc = Esys_Load(ctx, primary,
                    ESYS_TR_PASSWORD, ESYS_TR_NONE, ESYS_TR_NONE,
                    &keyPrivate, &keyPublic,
@@ -955,5 +955,3 @@ error:
     Esys_Finalize(&ctx);
     return (rc)? (int)rc : -1;
 }
-
-

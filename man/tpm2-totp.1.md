@@ -150,4 +150,3 @@ tpm2tss is Copyright (C) 2018 Fraunhofer SIT. License BSD 3-clause.
 # SEE ALSO
 
 tpm2totp_generateKey(3)
-

@@ -55,7 +55,7 @@ main(int argc, char **argv)
     if (!!memcmp(&totp_string[0], &totp_check[0], 7)) {
         fprintf(stderr, "TPM's %s != %s\n", totp_string, totp_check);
         goto err;
-    }    
+    }
 
 /**********/
 
