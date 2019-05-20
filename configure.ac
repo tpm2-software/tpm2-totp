@@ -80,6 +80,7 @@ AS_IF([test "x$enable_debug" != "xno"],
 
 PKG_PROG_PKG_CONFIG([0.25])
 PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
+PKG_CHECK_MODULES([TSS2_MU],[tss2-mu])
 PKG_CHECK_MODULES([QRENCODE],[libqrencode])
 
 AC_PATH_PROG([PANDOC], [pandoc])
