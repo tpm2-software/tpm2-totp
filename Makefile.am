@@ -6,9 +6,9 @@
 INCLUDE_DIRS    = -I$(srcdir)/include -I$(srcdir)/src
 ACLOCAL_AMFLAGS = -I m4 --install
 AM_CFLAGS       = $(INCLUDE_DIRS) $(EXTRA_CFLAGS) $(TSS2_ESYS_CFLAGS) \
-                  $(QRENCODE_CFLAGS) $(CODE_COVERAGE_CFLAGS)
+                  $(TSS2_MU_CFLAGS) $(QRENCODE_CFLAGS) $(CODE_COVERAGE_CFLAGS)
 AM_LDFLAGS      = $(EXTRA_LDFLAGS) $(CODE_COVERAGE_LIBS)
-AM_LDADD        = $(TSS2_ESYS_LIBS) $(QRENCODE_LIBS) -ldl
+AM_LDADD        = $(TSS2_ESYS_LIBS) $(TSS2_MU_LIBS) $(QRENCODE_LIBS) -ldl
 
 # Initialize empty variables to be extended throughout
 bin_PROGRAMS =
