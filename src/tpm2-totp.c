@@ -93,7 +93,7 @@ int
 parse_pcrs(char *str, int *pcrs)
 {
     char *token;
-    char *saveptr;
+    char *saveptr = NULL;
     char *endptr;
     long pcr;
 
