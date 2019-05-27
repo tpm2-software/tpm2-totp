@@ -45,7 +45,7 @@ PKG_INSTALLDIR()
 AX_RECURSIVE_EVAL([$libexecdir], [LIBEXECDIR])
 AC_SUBST([LIBEXECDIR])
 
-AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc dist/initcpio/install/plymouth-tpm2-totp])
+AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/plymouth-tpm2-totp])
 
 AX_ADD_COMPILER_FLAG([-std=c99])
 AX_ADD_COMPILER_FLAG([-Wall])
@@ -89,6 +89,12 @@ AS_IF([test -z "$PANDOC"],
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
 AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
+AC_ARG_WITH([dracutmodulesdir],
+            AS_HELP_STRING([--with-dracutmodulesdir=DIR], [directory for dracut hooks]),,
+            [PKG_CHECK_VAR([with_dracutmodulesdir], [dracut], [dracutmodulesdir])])
+AM_CONDITIONAL(HAVE_DRACUT, [test -n "$with_dracutmodulesdir" -a "x$with_dracutmodulesdir" != xno])
+AM_COND_IF([HAVE_DRACUT], [AC_SUBST([dracutdir], [$with_dracutmodulesdir/70tpm2-totp])])
+
 AC_ARG_WITH([mkinitcpiodir],
             AS_HELP_STRING([--with-mkinitcpiodir=DIR], [directory for mkinitcpio hooks]))
 AC_CHECK_PROG([mkinitcpio], [mkinitcpio], [yes])
@@ -107,7 +113,10 @@ AS_IF([test "x$enable_plymouth" != "xno"],
                          [have_plymouth=yes], [have_plymouth=no])],
       [have_plymouth=no])
 AM_CONDITIONAL([PLYMOUTH], [test "x$have_plymouth" = "xyes"])
-AS_IF([test "x$have_plymouth" = "xyes"],,
+AS_IF([test "x$have_plymouth" = "xyes"],
+      [PKG_CHECK_VAR([PLYMOUTHPLUGINSDIR], [ply-splash-core], [pluginsdir])
+       AC_SUBST([PLYMOUTHPLUGINSDIR])
+      ],
       [AS_IF([test "x$enable_plymouth" = "xyes"],
              [AC_MSG_ERROR([plymouth requested but not found])
       ])
@@ -156,6 +165,7 @@ AC_OUTPUT
 AC_MSG_RESULT([
 $PACKAGE_NAME $VERSION
     man-pages:  $PANDOC
+    dracut:     $with_dracutmodulesdir
     mkinitcpio: $with_mkinitcpiodir
     plymouth:   $have_plymouth
 ])

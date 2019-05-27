@@ -137,6 +137,15 @@ EXTRA_DIST += \
 CLEANFILES += \
     $(man1_MANS)
 
+### initramfs hooks ###
+
+if HAVE_DRACUT
+if PLYMOUTH
+dracut_DATA = dist/dracut/module-setup.sh dist/dracut/tpm2-totp.sh
+endif # PLYMOUTH
+endif # HAVE_DRACUT
+EXTRA_DIST += dist/dracut/tpm2-totp.sh
+
 if HAVE_MKINITCPIO
 initcpio_install_DATA = dist/initcpio/install/tpm2-totp
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp

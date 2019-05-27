@@ -1,0 +1,28 @@
+#!/bin/bash
+
+check() {
+    if [ -n "$hostonly" ]; then
+        if tpm2-totp calculate >/dev/null 2>&1; then
+            return 0
+        else
+            dinfo "dracut module 'tpm2-totp' will not be installed because no TOTP is configured; run 'tpm2-totp generate'!"
+        fi
+    fi
+    return 255
+}
+
+depends() {
+    echo plymouth
+}
+
+install() {
+    inst @LIBEXECDIR@/plymouth-tpm2-totp /bin/plymouth-tpm2-totp
+    inst_library @PLYMOUTHPLUGINSDIR@/label.so
+    inst_simple /usr/share/fonts/TTF/DejaVuSans.ttf
+    inst_hook pre-udev 70 "$moddir/tpm2-totp.sh"
+    dracut_need_initqueue
+}
+
+installkernel() {
+    instmods =drivers/char/tpm
+}
