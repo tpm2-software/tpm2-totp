@@ -11,7 +11,7 @@ build() {
         add_all_modules /tpm/
     fi
 
-    add_binary /usr/lib/plymouth/label.so
+    add_binary @PLYMOUTHPLUGINSDIR@/label.so
     add_file /usr/share/fonts/TTF/DejaVuSans.ttf
 
     add_binary @LIBEXECDIR@/plymouth-tpm2-totp /usr/bin/plymouth-tpm2-totp
