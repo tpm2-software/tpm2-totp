@@ -95,16 +95,15 @@ AC_ARG_WITH([dracutmodulesdir],
 AM_CONDITIONAL(HAVE_DRACUT, [test -n "$with_dracutmodulesdir" -a "x$with_dracutmodulesdir" != xno])
 AM_COND_IF([HAVE_DRACUT], [AC_SUBST([dracutdir], [$with_dracutmodulesdir/70tpm2-totp])])
 
-AC_ARG_WITH([mkinitcpiodir],
-            AS_HELP_STRING([--with-mkinitcpiodir=DIR], [directory for mkinitcpio hooks]))
 AC_CHECK_PROG([mkinitcpio], [mkinitcpio], [yes])
-AS_IF([test "x$mkinitcpio" = xyes -a -z "$with_mkinitcpiodir"],
-      [with_mkinitcpiodir=$sysconfdir/initcpio])
-AS_IF([test "x$with_mkinitcpiodir" != xno],
-      [AC_SUBST([initcpio_installdir], [$with_mkinitcpiodir/install])
-       AC_SUBST([initcpio_hooksdir], [$with_mkinitcpiodir/hooks])
-      ])
+AC_ARG_WITH([mkinitcpiodir],
+            AS_HELP_STRING([--with-mkinitcpiodir=DIR], [directory for mkinitcpio hooks]),,
+            [AS_IF([test "x$mkinitcpio" = xyes], [with_mkinitcpiodir=$sysconfdir/initcpio])])
 AM_CONDITIONAL(HAVE_MKINITCPIO, [test -n "$with_mkinitcpiodir" -a "x$with_mkinitcpiodir" != xno])
+AM_COND_IF([HAVE_MKINITCPIO],
+           [AC_SUBST([initcpio_installdir], [$with_mkinitcpiodir/install])
+            AC_SUBST([initcpio_hooksdir], [$with_mkinitcpiodir/hooks])
+           ])
 
 AC_ARG_ENABLE([plymouth],
               AS_HELP_STRING([--disable-plymouth], [Disable plymouth support]))
