@@ -52,13 +52,13 @@ tpm2_totp_CFLAGS = $(AM_CFLAGS) $(QRENCODE_CFLAGS)
 tpm2_totp_LDADD = $(AM_LDADD) $(QRENCODE_LIBS) -ldl libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
-if PLYMOUTH
+if HAVE_PLYMOUTH
 libexec_PROGRAMS += plymouth-tpm2-totp
 plymouth_tpm2_totp_SOURCES = src/plymouth-tpm2-totp.c src/tpm2-totp-tcti.c
 plymouth_tpm2_totp_CFLAGS = $(AM_CFLAGS) $(PLY_BOOT_CLIENT_CFLAGS)
 plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(PLY_BOOT_CLIENT_LIBS) -ldl libtpm2-totp.la
 plymouth_tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
-endif # PLYMOUTH
+endif # HAVE_PLYMOUTH
 
 ### Tests ###
 TESTS =
@@ -70,9 +70,9 @@ if HAVE_MKINITCPIO
 TESTS += $(TESTS_MKINITCPIO)
 endif # HAVE_MKINITCPIO
 
-if PLYMOUTH
+if HAVE_PLYMOUTH
 TESTS += $(TESTS_PLYMOUTH)
-endif # PLYMOUTH
+endif # HAVE_PLYMOUTH
 endif #INTEGRATION
 TESTS_SHELL = test/libtpm2-totp.sh \
               test/tpm2-totp.sh
@@ -140,19 +140,19 @@ CLEANFILES += \
 ### initramfs hooks ###
 
 if HAVE_DRACUT
-if PLYMOUTH
+if HAVE_PLYMOUTH
 dracut_DATA = dist/dracut/module-setup.sh dist/dracut/tpm2-totp.sh
-endif # PLYMOUTH
+endif # HAVE_PLYMOUTH
 endif # HAVE_DRACUT
 EXTRA_DIST += dist/dracut/tpm2-totp.sh
 
 if HAVE_MKINITCPIO
 initcpio_install_DATA = dist/initcpio/install/tpm2-totp
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
-if PLYMOUTH
+if HAVE_PLYMOUTH
 initcpio_install_DATA += dist/initcpio/install/plymouth-tpm2-totp
 initcpio_hooks_DATA += dist/initcpio/hooks/plymouth-tpm2-totp
-endif # PLYMOUTH
+endif # HAVE_PLYMOUTH
 endif # HAVE_MKINITCPIO
 EXTRA_DIST += \
 	dist/initcpio/install/tpm2-totp \
