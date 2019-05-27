@@ -111,15 +111,14 @@ AS_IF([test "x$enable_plymouth" != "xno"],
       [PKG_CHECK_MODULES([PLY_BOOT_CLIENT], [ply-boot-client],
                          [have_plymouth=yes], [have_plymouth=no])],
       [have_plymouth=no])
-AM_CONDITIONAL([PLYMOUTH], [test "x$have_plymouth" = "xyes"])
-AS_IF([test "x$have_plymouth" = "xyes"],
-      [PKG_CHECK_VAR([PLYMOUTHPLUGINSDIR], [ply-splash-core], [pluginsdir])
-       AC_SUBST([PLYMOUTHPLUGINSDIR])
-      ],
-      [AS_IF([test "x$enable_plymouth" = "xyes"],
-             [AC_MSG_ERROR([plymouth requested but not found])
-      ])
-])
+AM_CONDITIONAL([HAVE_PLYMOUTH], [test "x$have_plymouth" = "xyes"])
+AM_COND_IF([HAVE_PLYMOUTH],
+           [PKG_CHECK_VAR([PLYMOUTHPLUGINSDIR], [ply-splash-core], [pluginsdir])
+            AC_SUBST([PLYMOUTHPLUGINSDIR])
+           ],
+           [AS_IF([test "x$enable_plymouth" = "xyes"],
+                  [AC_MSG_ERROR([plymouth requested but not found])])
+           ])
 
 AC_ARG_ENABLE([integration],
             [AS_HELP_STRING([--enable-integration],
@@ -138,7 +137,7 @@ AS_IF([test "x$enable_integration" != xno],
        AS_IF([test "x$ss" != xyes],
              [AC_MSG_ERROR([Integration tests require the ss executable])])
 
-       AS_IF([test "x$have_plymouth" = "xyes"],
+       AM_COND_IF([HAVE_PLYMOUTH],
              [AC_CHECK_PROG([plymouthd], [plymouthd], [yes])
               AS_IF([test "x$plymouthd" != xyes],
                     [AC_MSG_ERROR([Integration tests require the plymouthd executable])])
