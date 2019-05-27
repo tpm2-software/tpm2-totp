@@ -7,6 +7,6 @@ Name: tpm2-totp
 Description: Attest the trustworthiness of a device against a human using time-based one-time passwords
 URL: https://github.com/tpm2-software/tpm2-totp
 Version: @VERSION@
-Requires.private: tss2-esys
+Requires.private: tss2-esys tss2-mu
 Cflags: -I${includedir}
 Libs: -L${libdir} -ltpm2-totp
