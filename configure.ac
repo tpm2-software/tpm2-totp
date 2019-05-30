@@ -47,23 +47,30 @@ AC_SUBST([LIBEXECDIR])
 
 AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/plymouth-tpm2-totp])
 
-AX_ADD_COMPILER_FLAG([-std=c99])
-AX_ADD_COMPILER_FLAG([-Wall])
-AX_ADD_COMPILER_FLAG([-Wextra])
-AX_ADD_COMPILER_FLAG([-Wformat-security])
-AX_ADD_COMPILER_FLAG([-Werror])
-AX_ADD_COMPILER_FLAG([-fstack-protector-all])
-AX_ADD_COMPILER_FLAG([-fpic])
-AX_ADD_COMPILER_FLAG([-fPIC])
+AC_ARG_ENABLE([defaultflags],
+              [AS_HELP_STRING([--disable-defaultflags],
+                              [Disable default preprocessor, compiler, and linker flags.])],,
+              [enable_defaultflags=yes])
+AS_IF([test "x$enable_defaultflags" = "xyes"],
+      [
+      AX_ADD_COMPILER_FLAG([-std=c99])
+      AX_ADD_COMPILER_FLAG([-Wall])
+      AX_ADD_COMPILER_FLAG([-Wextra])
+      AX_ADD_COMPILER_FLAG([-Wformat-security])
+      AX_ADD_COMPILER_FLAG([-Werror])
+      AX_ADD_COMPILER_FLAG([-fstack-protector-all])
+      AX_ADD_COMPILER_FLAG([-fpic])
+      AX_ADD_COMPILER_FLAG([-fPIC])
 
-# work around GCC bug #53119
-#   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
-AX_ADD_COMPILER_FLAG([-Wno-missing-braces])
+      # work around GCC bug #53119
+      #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
+      AX_ADD_COMPILER_FLAG([-Wno-missing-braces])
 
-AX_ADD_LINK_FLAG([-Wl,--no-undefined])
-AX_ADD_LINK_FLAG([-Wl,-z,noexecstack])
-AX_ADD_LINK_FLAG([-Wl,-z,now])
-AX_ADD_LINK_FLAG([-Wl,-z,relro])
+      AX_ADD_LINK_FLAG([-Wl,--no-undefined])
+      AX_ADD_LINK_FLAG([-Wl,-z,noexecstack])
+      AX_ADD_LINK_FLAG([-Wl,-z,now])
+      AX_ADD_LINK_FLAG([-Wl,-z,relro])
+      ])
 
 AX_CODE_COVERAGE
 m4_ifdef([_AX_CODE_COVERAGE_RULES],
