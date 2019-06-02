@@ -15,6 +15,8 @@ depcomp
 dist/*.pc
 dist/dracut/module-setup.sh
 dist/initcpio/install/plymouth-tpm2-totp
+Doxyfile
+doxygen-doc/
 install-sh
 libtool
 ltmain.sh

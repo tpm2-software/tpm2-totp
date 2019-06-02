@@ -45,7 +45,7 @@ PKG_INSTALLDIR()
 AX_RECURSIVE_EVAL([$libexecdir], [LIBEXECDIR])
 AC_SUBST([LIBEXECDIR])
 
-AC_CONFIG_FILES([Makefile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/plymouth-tpm2-totp])
+AC_CONFIG_FILES([Makefile Doxyfile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/plymouth-tpm2-totp])
 
 AC_ARG_ENABLE([defaultflags],
               [AS_HELP_STRING([--disable-defaultflags],
@@ -90,11 +90,27 @@ PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
 PKG_CHECK_MODULES([TSS2_MU],[tss2-mu])
 PKG_CHECK_MODULES([QRENCODE],[libqrencode])
 
+DX_DOXYGEN_FEATURE(ON)
+DX_DOT_FEATURE(OFF)
+DX_HTML_FEATURE(OFF)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(ON)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN([$PACKAGE_NAME], [Doxyfile], [doxygen-doc])
+AS_IF([test -z "$DX_DOXYGEN"],
+    [AC_MSG_WARN([Required executable doxygen not found, man pages will not be built])])
+AM_CONDITIONAL([HAVE_DOXYGEN],[test -n "$DX_DOXYGEN"])
+AM_CONDITIONAL([HAVE_DOXYGEN_MAN_PAGES],[test -d "${srcdir}/doxygen-doc/man/man3" -o -n "$DX_DOXYGEN"])
+
 AC_PATH_PROG([PANDOC], [pandoc])
 AS_IF([test -z "$PANDOC"],
     [AC_MSG_WARN([Required executable pandoc not found, man pages will not be built])])
 AM_CONDITIONAL([HAVE_PANDOC],[test -n "$PANDOC"])
-AM_CONDITIONAL([HAVE_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
+AM_CONDITIONAL([HAVE_PANDOC_MAN_PAGES],[test -d "${srcdir}/man/man1" -o -n "$PANDOC"])
 
 AC_ARG_WITH([dracutmodulesdir],
             AS_HELP_STRING([--with-dracutmodulesdir=DIR], [directory for dracut hooks]),,
@@ -169,7 +185,8 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 $PACKAGE_NAME $VERSION
-    man-pages:  $PANDOC
+    doxygen:    $DOXYGEN
+    pandoc:     $PANDOC
     dracut:     $with_dracutmodulesdir
     mkinitcpio: $with_mkinitcpiodir
     plymouth:   $have_plymouth
