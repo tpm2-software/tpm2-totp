@@ -1,0 +1,23 @@
+#!/bin/sh
+
+PREREQ='plymouth'
+prereqs() {
+    echo "$PREREQ"
+}
+
+case $1 in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+for arg in $(cat /proc/cmdline); do
+    case "$arg" in
+        rd.tpm2-totp.nvindex=*)
+            nvindex="${arg#rd.tpm2-totp.nvindex=}"
+            ;;
+    esac
+done
+
+TSS2_LOG=tcti+error /bin/plymouth-tpm2-totp ${nvindex:+--nvindex "$nvindex"} &
