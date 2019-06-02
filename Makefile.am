@@ -2,6 +2,8 @@
 # Copyright (c) 2018 Fraunhofer SIT
 # All rights reserved.
 
+-include $(top_srcdir)/git.mk
+
 ### Initialize global variables used throughout the file ###
 INCLUDE_DIRS    = -I$(srcdir)/include -I$(srcdir)/src
 ACLOCAL_AMFLAGS = -I m4 --install
@@ -24,6 +26,29 @@ EXTRA_DIST =
 DISTCLEANFILES =
 CLEANFILES =
 MOSTLYCLEANFILES =
+MAINTAINERCLEANFILES = \
+    $(DIST_ARCHIVES) \
+    AUTHORS
+GITIGNOREFILES = \
+    $(GITIGNORE_MAINTAINERCLEANFILES_TOPLEVEL) \
+    $(GITIGNORE_MAINTAINERCLEANFILES_MAKEFILE_IN) \
+    $(GITIGNORE_MAINTAINERCLEANFILES_M4_LIBTOOL) \
+    aminclude_static.am \
+    m4/ax_ac_append_to_file.m4 \
+    m4/ax_ac_print_to_file.m4 \
+    m4/ax_add_am_macro_static.m4 \
+    m4/ax_add_fortify_source.m4 \
+    m4/ax_am_macros_static.m4 \
+    m4/ax_check_compile_flag.m4 \
+    m4/ax_check_enable_debug.m4 \
+    m4/ax_check_gnu_make.m4 \
+    m4/ax_check_link_flag.m4 \
+    m4/ax_code_coverage.m4 \
+    m4/ax_file_escapes.m4 \
+    m4/ax_is_release.m4 \
+    m4/ax_prog_doxygen.m4 \
+    m4/ax_recursive_eval.m4 \
+    m4/pkg.m4
 
 ### Add ax_* rules ###
 # ax_code_coverage
