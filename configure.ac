@@ -48,7 +48,7 @@ PKG_INSTALLDIR()
 AX_RECURSIVE_EVAL([$libexecdir], [LIBEXECDIR])
 AC_SUBST([LIBEXECDIR])
 
-AC_CONFIG_FILES([Makefile Doxyfile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/tpm2-totp dist/initcpio/install/plymouth-tpm2-totp])
+AC_CONFIG_FILES([Makefile Doxyfile dist/tpm2-totp.pc])
 
 AC_ARG_ENABLE([defaultflags],
               [AS_HELP_STRING([--disable-defaultflags],
@@ -125,6 +125,7 @@ AC_ARG_WITH([dracutmodulesdir],
             [PKG_CHECK_VAR([with_dracutmodulesdir], [dracut], [dracutmodulesdir])])
 AM_CONDITIONAL(HAVE_DRACUT, [test -n "$with_dracutmodulesdir" -a "x$with_dracutmodulesdir" != xno])
 AM_COND_IF([HAVE_DRACUT], [AC_SUBST([dracutdir], [$with_dracutmodulesdir/70tpm2-totp])])
+AC_CONFIG_FILES([dist/dracut/module-setup.sh])
 
 AC_CHECK_PROG([mkinitcpio], [mkinitcpio], [yes])
 AC_ARG_WITH([mkinitcpiodir],
@@ -135,6 +136,7 @@ AM_COND_IF([HAVE_MKINITCPIO],
            [AC_SUBST([initcpio_installdir], [$with_mkinitcpiodir/install])
             AC_SUBST([initcpio_hooksdir], [$with_mkinitcpiodir/hooks])
            ])
+AC_CONFIG_FILES([dist/initcpio/install/tpm2-totp dist/initcpio/install/plymouth-tpm2-totp])
 
 AC_ARG_ENABLE([plymouth],
               AS_HELP_STRING([--disable-plymouth], [Disable plymouth support]))
