@@ -88,6 +88,11 @@ TPML_PCR_SELECTION allCreationPCR = { .count = 0 };
 
 TPM2B_AUTH emptyAuth = { .size = 0, };
 
+/** @defgroup tpm2-totp libtpm2-totp
+ *  Attest the trustworthiness of a device against a human using time-based one-time passwords.
+ *  @{
+ */
+
 /** Generate a key.
  *
  * @param[in] pcrs PCRs the key should be sealed against.
@@ -954,3 +959,5 @@ error:
     Esys_Finalize(&ctx);
     return (rc)? (int)rc : -1;
 }
+
+/** @} */

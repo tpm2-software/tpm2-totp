@@ -33,6 +33,10 @@ else
 @CODE_COVERAGE_RULES@
 endif
 
+# ax_prog_doxygen
+@DX_RULES@
+MOSTLYCLEANFILES += $(DX_CLEANFILES)
+
 ### Library ###
 lib_LTLIBRARIES += libtpm2-totp.la
 include_HEADERS += include/tpm2-totp.h
@@ -107,7 +111,7 @@ AUTHORS:
 EXTRA_DIST += AUTHORS
 CLEANFILES += AUTHORS
 
-if HAVE_MAN_PAGES
+if HAVE_PANDOC_MAN_PAGES
 ### Man Pages
 man1_MANS = \
     man/man1/tpm2-totp.1
@@ -129,13 +133,23 @@ endif
 man/man1/%.1: man/%.1.md
 	$(AM_V_GEN)mkdir -p man/man1 && cat $< | $(PANDOC) -s -t man >$@
 
-man/man3/%.3: man/%.3.md
-	$(AM_V_GEN)mkdir -p man/man3 && cat $< | $(PANDOC) -s -t man >$@
-
 EXTRA_DIST += \
     man/tpm2-totp.1.md
 CLEANFILES += \
     $(man1_MANS)
+
+if HAVE_DOXYGEN_MAN_PAGES
+man3_MANS = doxygen-doc/man/man3/tpm2-totp.3
+endif # HAVE_DOXYGEN_MAN_PAGES
+
+if HAVE_DOXYGEN
+$(man3_MANS): doxygen-doc
+EXTRA_DIST += $(man3_MANS)
+else # HAVE_DOXYGEN
+dist-hook:
+	@(>&2 echo "You do not have doxygen, a requirement for the distribution of manpages")
+	@exit 1
+endif # HAVE_DOXYGEN
 
 ### initramfs hooks ###
 
