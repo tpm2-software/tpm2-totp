@@ -12,7 +12,7 @@ build() {
     fi
 
     add_binary @PLYMOUTHPLUGINSDIR@/label.so
-    add_file /usr/share/fonts/TTF/DejaVuSans.ttf
+    add_file "$(fc-match --format '%{file}')"
 
     add_binary @LIBEXECDIR@/plymouth-tpm2-totp /usr/bin/plymouth-tpm2-totp
 

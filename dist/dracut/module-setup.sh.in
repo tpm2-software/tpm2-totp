@@ -18,7 +18,7 @@ depends() {
 install() {
     inst @LIBEXECDIR@/plymouth-tpm2-totp /bin/plymouth-tpm2-totp
     inst_library @PLYMOUTHPLUGINSDIR@/label.so
-    inst_simple /usr/share/fonts/TTF/DejaVuSans.ttf
+    inst_simple "$(fc-match --format '%{file}')"
     inst_hook pre-udev 70 "$moddir/tpm2-totp.sh"
     dracut_need_initqueue
 }
