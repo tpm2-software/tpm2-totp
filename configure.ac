@@ -33,6 +33,9 @@ AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Wno-portability])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE([enable])
 
+AX_IS_RELEASE([dash-version])
+AX_CHECK_ENABLE_DEBUG([info])
+
 AC_USE_SYSTEM_EXTENSIONS
 
 AC_PROG_CC
@@ -57,7 +60,7 @@ AS_IF([test "x$enable_defaultflags" = "xyes"],
       AX_ADD_COMPILER_FLAG([-Wall])
       AX_ADD_COMPILER_FLAG([-Wextra])
       AX_ADD_COMPILER_FLAG([-Wformat-security])
-      AX_ADD_COMPILER_FLAG([-Werror])
+      AS_IF([test "x$ax_is_release" = "xno"], [AX_ADD_COMPILER_FLAG([-Werror])])
       AX_ADD_COMPILER_FLAG([-fstack-protector-all])
       AX_ADD_COMPILER_FLAG([-fpic])
       AX_ADD_COMPILER_FLAG([-fPIC])
@@ -77,13 +80,6 @@ m4_ifdef([_AX_CODE_COVERAGE_RULES],
          [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [true])],
          [AM_CONDITIONAL(AUTOCONF_CODE_COVERAGE_2019_01_06, [false])])
 AX_ADD_AM_MACRO_STATIC([])
-
-AC_ARG_ENABLE([debug],
-            [AS_HELP_STRING([--enable-debug],
-                            [build with debug output])],,
-            [enable_debug=no])
-AS_IF([test "x$enable_debug" != "xno"],
-      AC_DEFINE_UNQUOTED([DEBUG], [1], ["Debug output enabled"]))
 
 PKG_PROG_PKG_CONFIG([0.25])
 PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
