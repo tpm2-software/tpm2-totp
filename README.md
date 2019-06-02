@@ -56,8 +56,8 @@ build options are available in the [INSTALL](INSTALL.md) file.
 ## Setup
 The TOTP secret can be generated with and without password. It is recommended to
 set a password `-P`in order to enable recovery options. Also the PCRs and PCR
-banks can be selected `-p` and `-b`. Default values are PCRs `0,2,4` and all
-available banks from the list `SHA1, SHA256, SHA384`.
+banks can be selected `-p` and `-b`. Default values are PCRs `0,2,4` and
+banks `SHA1, SHA256`.
 ```
 tpm2-totp generate
 tpm2-totp -P verysecret generate
