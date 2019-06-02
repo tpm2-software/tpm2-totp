@@ -532,8 +532,8 @@ error:
 
 /** Store a key in a NV index.
  *
- * @param[in] keyblob Key to store to NVRAM.
- * @param[in] keyblob_size Size of the key.
+ * @param[in] keyBlob Key to store to NVRAM.
+ * @param[in] keyBlob_size Size of the key.
  * @param[in] nv NV index to store the key.
  * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @retval 0 on success.
