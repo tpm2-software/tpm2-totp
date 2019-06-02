@@ -127,6 +127,17 @@ AM_CONDITIONAL(HAVE_DRACUT, [test -n "$with_dracutmodulesdir" -a "x$with_dracutm
 AM_COND_IF([HAVE_DRACUT], [AC_SUBST([dracutdir], [$with_dracutmodulesdir/70tpm2-totp])])
 AC_CONFIG_FILES([dist/dracut/module-setup.sh])
 
+AC_CHECK_PROG([lsinitramfs], [lsinitramfs], [yes])
+AC_ARG_WITH([initramfstoolsdir],
+            AS_HELP_STRING([--with-initramfstoolsdir=DIR], [directory for initramfs-tools scripts]),,
+            [AS_IF([test "x$lsinitramfs" = xyes], [with_initramfstoolsdir=$sysconfdir/initramfs-tools])])
+AM_CONDITIONAL(HAVE_INITRAMFSTOOLS, [test -n "$with_initramfstoolsdir" -a "x$with_initramfstoolsdir" != xno])
+AM_COND_IF([HAVE_INITRAMFSTOOLS],
+           [AC_SUBST([initramfstools_hooksdir], [$with_initramfstoolsdir/hooks])
+            AC_SUBST([initramfstools_scriptsdir], [$with_initramfstoolsdir/scripts/init-premount])
+])
+AC_CONFIG_FILES([dist/initramfs-tools/hooks/tpm2-totp])
+
 AC_CHECK_PROG([mkinitcpio], [mkinitcpio], [yes])
 AC_ARG_WITH([mkinitcpiodir],
             AS_HELP_STRING([--with-mkinitcpiodir=DIR], [directory for mkinitcpio hooks]),,
@@ -195,9 +206,10 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 $PACKAGE_NAME $VERSION
-    doxygen:    $DOXYGEN
-    pandoc:     $PANDOC
-    dracut:     $with_dracutmodulesdir
-    mkinitcpio: $with_mkinitcpiodir
-    plymouth:   $have_plymouth
+    doxygen:         $DOXYGEN
+    pandoc:          $PANDOC
+    dracut:          $with_dracutmodulesdir
+    initramfs-tools: $with_initramfstoolsdir
+    mkinitcpio:      $with_mkinitcpiodir
+    plymouth:        $have_plymouth
 ])

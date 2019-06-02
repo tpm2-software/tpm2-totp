@@ -186,6 +186,14 @@ endif # HAVE_PLYMOUTH
 endif # HAVE_DRACUT
 EXTRA_DIST += dist/dracut/tpm2-totp.sh
 
+if HAVE_INITRAMFSTOOLS
+if HAVE_PLYMOUTH
+initramfstools_hooks_SCRIPTS = dist/initramfs-tools/hooks/tpm2-totp
+initramfstools_scripts_SCRIPTS = dist/initramfs-tools/scripts/init-premount/tpm2-totp
+endif # HAVE_PLYMOUTH
+endif # HAVE_INITRAMFSTOOLS
+EXTRA_DIST += dist/initramfs-tools/scripts/init-premount/tpm2-totp
+
 if HAVE_MKINITCPIO
 initcpio_install_DATA = dist/initcpio/install/tpm2-totp
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
