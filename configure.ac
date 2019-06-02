@@ -64,6 +64,7 @@ AS_IF([test "x$enable_defaultflags" = "xyes"],
       AX_ADD_COMPILER_FLAG([-fstack-protector-all])
       AX_ADD_COMPILER_FLAG([-fpic])
       AX_ADD_COMPILER_FLAG([-fPIC])
+      AX_ADD_FORTIFY_SOURCE
 
       # work around GCC bug #53119
       #   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53119
