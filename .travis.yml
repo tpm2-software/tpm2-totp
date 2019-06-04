@@ -6,9 +6,6 @@ compiler:
 dist: xenial
 
 env:
-  matrix:
-  - OPENSSL_BRANCH=OpenSSL_1_0_2-stable
-#  - OPENSSL_BRANCH=OpenSSL_1_1_0-stable
   global:
   - PATH="${PWD}/installdir/usr/local/bin:${PATH}"
   - PKG_CONFIG_PATH="${PWD}/installdir/usr/local/lib/pkgconfig:/usr/lib/pkgconfig"
@@ -35,19 +32,6 @@ addons:
 install:
   - git clean -xdf
   - mkdir -p installdir/usr/local/bin
-# OpenSSL 1.0.2 / 1.1.0
-  - git clone --branch $OPENSSL_BRANCH --depth=1 https://github.com/openssl/openssl.git
-  - pushd openssl
-  - ./config --prefix=/usr/local --openssldir=/usr/local/openssl shared
-  - make -j$(nproc)
-  - |
-    if [ "$OPENSSL_BRANCH" == "OpenSSL_1_0_2-stable" ]; then
-        make install INSTALL_PREFIX=${PWD}/../installdir
-    else
-        make install DESTDIR=${PWD}/../installdir
-    fi
-  - which openssl
-  - popd
 # TPM Simulator
   - wget --no-check-certificate https://download.01.org/tpm2/ibmtpm974.tar.gz
     # we skip failing cert check and use the sha256sum instead
@@ -69,7 +53,7 @@ install:
   - pushd tpm2-tss
   - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
   - ./bootstrap
-  - ./configure --with-crypto=ossl CFLAGS=-I${PWD}/../installdir/usr/local/include LDFLAGS=-L${PWD}/../installdir/usr/local/lib
+  - ./configure
   - make -j$(nproc)
   - make install DESTDIR=${PWD}/../installdir
   - rm ${PWD}/../installdir/usr/local/lib/*.la
