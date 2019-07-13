@@ -73,7 +73,6 @@ libtpm2_totp_la_LIBADD = $(AM_LDADD)
 libtpm2_totp_la_LDFLAGS = $(AM_LDFLAGS) '(tpm2_totp)'
 
 pkgconfig_DATA = dist/tpm2-totp.pc
-DISTCLEANFILES += $(pkgconfig_DATA)
 
 ### Executable ###
 bin_PROGRAMS += tpm2-totp
