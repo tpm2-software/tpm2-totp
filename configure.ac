@@ -86,6 +86,14 @@ PKG_PROG_PKG_CONFIG([0.25])
 PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
 PKG_CHECK_MODULES([TSS2_MU],[tss2-mu])
 PKG_CHECK_VAR([TSS2_TCTI_DEVICE_LIBDIR], [tss2-tcti-device], [libdir])
+# Fallback for old versions of tpm2-tss without the libdir pkg-config variable
+AS_IF([test "x$TSS2_TCTI_DEVICE_LIBDIR" = "x"],
+      [TSS2_TCTI_DEVICE_LIBDIR=`PKG_CONFIG_ALLOW_SYSTEM_LIBS=1 $PKG_CONFIG --libs-only-L tss2-tcti-device`
+       TSS2_TCTI_DEVICE_LIBDIR=${TSS2_TCTI_DEVICE_LIBDIR#-L}
+       TSS2_TCTI_DEVICE_LIBDIR=${TSS2_TCTI_DEVICE_LIBDIR% }
+      ])
+AC_CHECK_FILE([$TSS2_TCTI_DEVICE_LIBDIR/libtss2-tcti-device.so], ,
+              [AC_MSG_ERROR([Required file libtss2-tcti-device.so not found])])
 AC_SUBST([TSS2_TCTI_DEVICE_LIBDIR])
 PKG_CHECK_MODULES([QRENCODE],[libqrencode])
 
