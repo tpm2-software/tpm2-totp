@@ -56,9 +56,9 @@ install:
   - pushd tpm2-tss
   - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
   - ./bootstrap
-  - ./configure
+  - ./configure --prefix=${PWD}/../installdir/usr/local
   - make -j$(nproc)
-  - make install DESTDIR=${PWD}/../installdir
+  - make install
   - rm ${PWD}/../installdir/usr/local/lib/*.la
   - popd
 # tpm2-tools
@@ -68,9 +68,9 @@ install:
   - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
   - ./bootstrap
   # Some workarounds for tpm2-tools with -Wno-XXX
-  - ./configure --disable-hardening CFLAGS="-I${PWD}/../installdir/usr/local/include -Wno-unused-value -Wno-missing-field-initializer" LDFLAGS=-L${PWD}/../installdir/usr/local/lib
+  - ./configure --disable-hardening CFLAGS="-I${PWD}/../installdir/usr/local/include -Wno-unused-value -Wno-missing-field-initializer" LDFLAGS=-L${PWD}/../installdir/usr/local/lib --prefix=${PWD}/../installdir/usr/local
   - make -j$(nproc)
-  - make install DESTDIR=${PWD}/../installdir
+  - make install
   - popd
 
 before_script:
