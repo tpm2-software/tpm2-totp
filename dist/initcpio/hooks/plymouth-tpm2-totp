@@ -1,7 +1,7 @@
 #!/usr/bin/ash
 
 run_hook() {
-    TSS2_LOG=esys+error plymouth-tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} &
+    TSS2_LOG=tcti+error plymouth-tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} &
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

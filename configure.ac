@@ -48,7 +48,7 @@ PKG_INSTALLDIR()
 AX_RECURSIVE_EVAL([$libexecdir], [LIBEXECDIR])
 AC_SUBST([LIBEXECDIR])
 
-AC_CONFIG_FILES([Makefile Doxyfile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/plymouth-tpm2-totp])
+AC_CONFIG_FILES([Makefile Doxyfile dist/tpm2-totp.pc dist/dracut/module-setup.sh dist/initcpio/install/tpm2-totp dist/initcpio/install/plymouth-tpm2-totp])
 
 AC_ARG_ENABLE([defaultflags],
               [AS_HELP_STRING([--disable-defaultflags],
@@ -85,6 +85,8 @@ AX_ADD_AM_MACRO_STATIC([])
 PKG_PROG_PKG_CONFIG([0.25])
 PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
 PKG_CHECK_MODULES([TSS2_MU],[tss2-mu])
+PKG_CHECK_VAR([TSS2_TCTI_DEVICE_LIBDIR], [tss2-tcti-device], [libdir])
+AC_SUBST([TSS2_TCTI_DEVICE_LIBDIR])
 PKG_CHECK_MODULES([QRENCODE],[libqrencode])
 
 DX_DOXYGEN_FEATURE(ON)
