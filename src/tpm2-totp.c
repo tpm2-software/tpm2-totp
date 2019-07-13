@@ -93,12 +93,15 @@ int
 parse_pcrs(char *str, int *pcrs)
 {
     char *token;
-    char *saveptr = NULL;
+    char *saveptr;
     char *endptr;
     long pcr;
 
     *pcrs = 0;
 
+    if (!str) {
+        return -1;
+    }
     token = strtok_r(str, ",", &saveptr);
     if (!token) {
         return -1;
