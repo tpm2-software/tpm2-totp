@@ -9,11 +9,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <liboath/oath.h>
-
-#include "tpm2-totp-tcti.h"
+#include <tss2/tss2_tctildr.h>
 
 #define chkrc(rc, cmd) if (rc != TSS2_RC_SUCCESS) {\
     fprintf(stderr, "ERROR in %s:%i: 0x%08x\n", __FILE__, __LINE__, rc); cmd; }
+
+#define TPM2TOTP_ENV_TCTI "TPM2TOTP_TCTI"
 
 #define PWD "hallo"
 
@@ -34,10 +35,8 @@ main(int argc, char **argv)
 
 /**********/
 
-    /* Initialize from environment variable */
-    if (tcti_init(NULL, &tcti_context) != 0) {
-        goto err;
-    }
+    rc = Tss2_TctiLdr_Initialize(getenv(TPM2TOTP_ENV_TCTI), &tcti_context);
+    chkrc(rc, goto err);
 
 /**********/
 
@@ -103,12 +102,12 @@ main(int argc, char **argv)
 
     free(keyBlob);
     free(secret);
-    tcti_finalize();
+    Tss2_TctiLdr_Finalize(&tcti_context);
     return 0;
 
 err:
     free(keyBlob);
     free(secret);
-    tcti_finalize();
+    Tss2_TctiLdr_Finalize(&tcti_context);
     return 1;
 }

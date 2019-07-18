@@ -8,7 +8,7 @@
 * C compiler
 * C library development libraries and header files
 * pkg-config
-* tpm2-tss >= 2.0
+* tpm2-tss >= 2.3
 * libqrencode
 * pandoc (optional, for man pages)
 * doxygen (optional, for man pages)

@@ -35,7 +35,7 @@ for attempt in $(seq 9 -1 0); do
     fi
 done
 
-export TPM2TOTP_TCTI="libtss2-tcti-mssim.so.0:port=$tpm_server_port"
+export TPM2TOTP_TCTI="mssim:port=$tpm_server_port"
 export TPM2TOOLS_TCTI="$TPM2TOTP_TCTI"
 
 tpm2_startup --clear
