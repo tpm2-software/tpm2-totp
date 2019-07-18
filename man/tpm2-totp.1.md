@@ -63,9 +63,9 @@ options.
     Display the date/time of the TOTP calculation (commands: calculate)
 
   * `-T <tcti-name>[:<tcti-config>]`, `--tcti <tcti-name>[:<tcti-config>]`:
-    Select the TCTI to use. The raw *tcti-name* is used to load a dynamic TCTI
-    interface using *dlopen(3)*. If present, the option config *tcti-config*
-    is passed verbatim to the chosen TCTI.
+    Select the TCTI to use. *tcti-name* is the name of the TCTI library.
+    If present, the configuration string *tcti-config* is passed verbatim to the
+    chosen TCTI library.
 
     The TCTI can additionally be specified using the environment variable
     `TPM2TOTP_TCTI`. If both the command line option and the environment
@@ -132,7 +132,7 @@ to specify the TCTI to be used. If the TCTI is not specified explicitly, the
 default TCTI configured on the system is used. To e.g. use the TPM simulator
 bound to a given port, use
 ```
-tpm2-totp -T libtss2-tcti-mssim.so.0:port=2321 generate
+tpm2-totp -T mssim:port=2321 generate
 ```
 
 # RETURNS

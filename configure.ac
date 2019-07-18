@@ -86,6 +86,7 @@ AX_ADD_AM_MACRO_STATIC([])
 PKG_PROG_PKG_CONFIG([0.25])
 PKG_CHECK_MODULES([TSS2_ESYS],[tss2-esys])
 PKG_CHECK_MODULES([TSS2_MU],[tss2-mu])
+PKG_CHECK_MODULES([TSS2_TCTILDR],[tss2-tctildr])
 PKG_CHECK_VAR([TSS2_TCTI_DEVICE_LIBDIR], [tss2-tcti-device], [libdir])
 # Fallback for old versions of tpm2-tss without the libdir pkg-config variable
 AS_IF([test "x$TSS2_TCTI_DEVICE_LIBDIR" = "x"],

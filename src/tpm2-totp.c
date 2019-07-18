@@ -14,14 +14,15 @@
 #include <inttypes.h>
 #include <getopt.h>
 #include <qrencode.h>
-
-#include "tpm2-totp-tcti.h"
+#include <tss2/tss2_tctildr.h>
 
 #define VERB(...) if (opt.verbose) fprintf(stderr, __VA_ARGS__)
 #define ERR(...) fprintf(stderr, __VA_ARGS__)
 
 #define chkrc(rc, cmd) if (rc != TSS2_RC_SUCCESS) {\
     ERR("ERROR in %s (%s:%i): 0x%08x\n", __func__, __FILE__, __LINE__, rc); cmd; }
+
+#define TPM2TOTP_ENV_TCTI "TPM2TOTP_TCTI"
 
 char *help =
     "Usage: [options] {generate|calculate|reseal|recover|clean}\n"
@@ -314,11 +315,13 @@ main(int argc, char **argv)
     uint64_t totp;
     time_t now;
     char timestr[100] = { 0, };
-
     TSS2_TCTI_CONTEXT *tcti_context;
-    if (tcti_init(opt.tcti, &tcti_context) != 0) {
-        goto err;
+
+    if (!opt.tcti) {
+        opt.tcti = getenv(TPM2TOTP_ENV_TCTI);
     }
+    rc = Tss2_TctiLdr_Initialize(opt.tcti, &tcti_context);
+    chkrc(rc, goto err);
 
     switch(opt.cmd) {
     case CMD_GENERATE:
@@ -411,10 +414,10 @@ main(int argc, char **argv)
         goto err;
     }
 
-    tcti_finalize();
+    Tss2_TctiLdr_Finalize(&tcti_context);
     return 0;
 
 err:
-    tcti_finalize();
+    Tss2_TctiLdr_Finalize(&tcti_context);
     return 1;
 }
