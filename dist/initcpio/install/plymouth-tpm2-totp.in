@@ -15,7 +15,7 @@ build() {
     add_file "$(fc-match --format '%{file}')"
 
     add_binary @LIBEXECDIR@/plymouth-tpm2-totp /usr/bin/plymouth-tpm2-totp
-    add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so
+    add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so.0
 
     add_runscript
 }
