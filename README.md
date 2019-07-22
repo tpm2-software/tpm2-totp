@@ -51,6 +51,16 @@ Followed by setting up the initrd, see below.
 Instructions on packages needed to build and install tpm2-totp and different
 build options are available in the [INSTALL](INSTALL.md) file.
 
+# Initramfs integration
+The project includes hooks for [dracut](https://dracut.wiki.kernel.org/),
+[initramfs-tools](https://wiki.debian.org/initramfs-tools) and
+[mkinitcpio](https://wiki.archlinux.org/index.php/Mkinitcpio) to display
+the TOTP during boot using [Plymouth](https://www.freedesktop.org/wiki/Software/Plymouth/).
+They are automatically installed if the corresponding tool is found on the
+system (also see [INSTALL](INSTALL.md) regarding necessary configuration
+options). To use them, install tpm2-totp and generate a TOTP secret, then enable
+the tpm2-totp hook in your initramfs generator and rebuild the initramfs.
+
 # Usage
 
 ## Setup
