@@ -12,7 +12,7 @@ build() {
     fi
 
     add_binary tpm2-totp
-    add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so
+    add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so.0
 
     add_runscript
 }
