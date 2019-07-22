@@ -11,6 +11,7 @@
 * tpm2-tss >= 2.0
 * libqrencode
 * pandoc
+* plymouth header files (optional, for initramfs integration)
 
 For the integration test suite:
 * liboath
@@ -32,7 +33,9 @@ sudo apt -y install \
   libqrencode-dev \
   pandoc \
   liboath-dev \
-  iproute2
+  iproute2 \
+  plymouth \
+  libplymouth-dev
 git clone --depth=1 http://www.github.com/tpm2-software/tpm2-tss
 cd tpm2-tss
 ./bootstrap
@@ -68,6 +71,14 @@ In order to link against a developer version of tpm2-tss (not installed):
   CFLAGS=-I${TPM2TSS}/include \
   LDFLAGS=-L${TPM2TSS}/src/tss2-{tcti,mu,sys,esys}/.libs
 ```
+
+# initramfs-tools and mkinitcpio integration
+To make sure that the hooks get installed to the correct directory, either use
+```
+./configure --sysconfdir=/etc
+```
+or set the correct directory directly with the `--with-initramfstoolsdir`/
+`--with-mkinitcpiodir` configuration option.
 
 # Post installation
 
