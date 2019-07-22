@@ -10,7 +10,8 @@
 * pkg-config
 * tpm2-tss >= 2.0
 * libqrencode
-* pandoc
+* pandoc (optional, for man pages)
+* doxygen (optional, for man pages)
 * plymouth header files (optional, for initramfs integration)
 
 For the integration test suite:
@@ -32,6 +33,7 @@ sudo apt -y install \
   pkg-config \
   libqrencode-dev \
   pandoc \
+  doxygen \
   liboath-dev \
   iproute2 \
   plymouth \
