@@ -182,9 +182,10 @@ endif # HAVE_DOXYGEN
 if HAVE_DRACUT
 if HAVE_PLYMOUTH
 dracut_SCRIPTS = dist/dracut/module-setup.sh dist/dracut/tpm2-totp.sh
+dracut_DATA = dist/dracut/README
 endif # HAVE_PLYMOUTH
 endif # HAVE_DRACUT
-EXTRA_DIST += dist/dracut/tpm2-totp.sh
+EXTRA_DIST += dist/dracut/tpm2-totp.sh dist/dracut/README
 
 if HAVE_INITRAMFSTOOLS
 if HAVE_PLYMOUTH
