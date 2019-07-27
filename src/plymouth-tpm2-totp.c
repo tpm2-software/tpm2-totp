@@ -143,6 +143,7 @@ display_totp(state_t *state, ply_event_loop_t *event_loop)
     int rc;
     uint64_t totp;
     time_t now;
+    struct tm now_local;
     char timestr[30] = "";
     char totpstr[40] = "";
 
@@ -151,7 +152,8 @@ display_totp(state_t *state, ply_event_loop_t *event_loop)
 
     if (rc == TSS2_RC_SUCCESS) {
         if (opt.time) {
-            if (strftime(timestr, sizeof(timestr)-1, "%F %T: ", localtime(&now)) == 0) {
+            localtime_r(&now, &now_local);
+            if (strftime(timestr, sizeof(timestr)-1, "%F %T: ", &now_local) == 0) {
                 timestr[0] = '\0';
             }
         }
