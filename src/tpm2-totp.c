@@ -314,6 +314,7 @@ main(int argc, char **argv)
     char *base32key, *url, *qrpic;
     uint64_t totp;
     time_t now;
+    struct tm now_local;
     char timestr[100] = { 0, };
     TSS2_TCTI_CONTEXT *tcti_context;
 
@@ -359,8 +360,9 @@ main(int argc, char **argv)
         free(keyBlob);
         chkrc(rc, goto err);
         if (opt.time) {
-            rc = !strftime (timestr, sizeof(timestr)-1, "%Y-%m-%d %H:%M:%S: ",
-                            localtime (&now));
+            localtime_r(&now, &now_local);
+            rc = !strftime(timestr, sizeof(timestr)-1, "%Y-%m-%d %H:%M:%S: ",
+                           &now_local);
             chkrc(rc, goto err);
         }
         printf("%s%06" PRIu64, timestr, totp);
