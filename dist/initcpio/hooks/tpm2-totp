@@ -2,10 +2,10 @@
 
 run_hook() {
     echo 'Verify the TOTP (press any key to continue):'
-    TSS2_LOG=tcti+error tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
+    tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
     echo
     while ! read -n 1 -r -s -t 10; do
-        TSS2_LOG=tcti+error tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
+        tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
         echo
     done
 }
