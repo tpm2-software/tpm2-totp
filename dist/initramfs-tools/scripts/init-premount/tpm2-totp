@@ -20,4 +20,4 @@ for arg in $(cat /proc/cmdline); do
     esac
 done
 
-TSS2_LOG=tcti+error /bin/plymouth-tpm2-totp ${nvindex:+--nvindex "$nvindex"} &
+/bin/plymouth-tpm2-totp ${nvindex:+--nvindex "$nvindex"} &
