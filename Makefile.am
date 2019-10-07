@@ -17,6 +17,7 @@ AM_DISTCHECK_CONFIGURE_FLAGS = --with-dracutmodulesdir='$$(libdir)/dracut/module
 # Initialize empty variables to be extended throughout
 bin_PROGRAMS =
 libexec_PROGRAMS =
+helpers_PROGRAMS =
 noinst_PROGRAMS =
 check_PROGRAMS =
 include_HEADERS =
@@ -83,7 +84,7 @@ tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(QRENCODE_LIBS) -ldl libtpm2
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
 if HAVE_PLYMOUTH
-libexec_PROGRAMS += plymouth-tpm2-totp
+helpers_PROGRAMS += plymouth-tpm2-totp
 plymouth_tpm2_totp_SOURCES = src/plymouth-tpm2-totp.c
 plymouth_tpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(PLY_BOOT_CLIENT_CFLAGS)
 plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(PLY_BOOT_CLIENT_LIBS) -ldl libtpm2-totp.la

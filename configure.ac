@@ -45,8 +45,10 @@ LT_INIT()
 
 PKG_INSTALLDIR()
 
-AX_RECURSIVE_EVAL([$libexecdir], [LIBEXECDIR])
-AC_SUBST([LIBEXECDIR])
+helpersdir="$libexecdir/tpm2-totp"
+AC_SUBST([helpersdir])
+AX_RECURSIVE_EVAL([$helpersdir], [HELPERSDIR])
+AC_SUBST([HELPERSDIR])
 
 AC_CONFIG_FILES([Makefile Doxyfile dist/tpm2-totp.pc])
 
