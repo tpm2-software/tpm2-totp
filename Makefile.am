@@ -179,11 +179,12 @@ EXTRA_DIST += dist/show-tpm2-totp
 
 if HAVE_DRACUT
 if HAVE_PLYMOUTH
-dracut_SCRIPTS = dist/dracut/module-setup.sh dist/dracut/tpm2-totp.sh
+dracut_SCRIPTS = dist/dracut/module-setup.sh dist/dracut/show-tpm2-totp.sh \
+                 dist/dracut/cleanup-tpm2-totp.sh dist/show-tpm2-totp
 dracut_DATA = dist/dracut/README
 endif # HAVE_PLYMOUTH
 endif # HAVE_DRACUT
-EXTRA_DIST += dist/dracut/tpm2-totp.sh dist/dracut/README
+EXTRA_DIST += dist/dracut/show-tpm2-totp.sh dist/dracut/cleanup-tpm2-totp.sh dist/dracut/README
 
 if HAVE_INITRAMFSTOOLS
 if HAVE_PLYMOUTH

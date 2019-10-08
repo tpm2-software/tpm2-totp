@@ -11,16 +11,19 @@ check() {
     return 255
 }
 
-depends() {
-    echo plymouth
-}
-
 install() {
-    inst @HELPERSDIR@/plymouth-tpm2-totp /bin/plymouth-tpm2-totp
     inst_libdir_file 'libtss2-tcti-device.so*'
-    inst_library @PLYMOUTHPLUGINSDIR@/label.so
-    inst_simple "$(fc-match --format '%{file}')"
-    inst_hook pre-udev 70 "$moddir/tpm2-totp.sh"
+    if dracut_module_included "plymouth"; then
+        inst @HELPERSDIR@/plymouth-tpm2-totp /bin/show-tpm2-totp
+        inst_library @PLYMOUTHPLUGINSDIR@/label.so
+        inst_simple "$(fc-match --format '%{file}')"
+    else
+        inst @HELPERSDIR@/show-tpm2-totp /bin/show-tpm2-totp
+        inst tpm2-totp
+        inst date
+        inst_hook cleanup 70 "$moddir/cleanup-tpm2-totp.sh"
+    fi
+    inst_hook pre-udev 70 "$moddir/show-tpm2-totp.sh"
     dracut_need_initqueue
 }
 
