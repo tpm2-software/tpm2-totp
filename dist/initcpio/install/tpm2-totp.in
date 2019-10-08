@@ -13,6 +13,8 @@ build() {
 
     add_binary tpm2-totp
     add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so.0
+    add_binary @HELPERSDIR@/show-tpm2-totp /usr/bin/show-tpm2-totp
+    add_binary date
 
     add_runscript
 }
