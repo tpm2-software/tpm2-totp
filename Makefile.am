@@ -97,19 +97,14 @@ TESTS =
 if INTEGRATION
 TESTS += $(TESTS_SHELL)
 
-if HAVE_MKINITCPIO
-TESTS += $(TESTS_MKINITCPIO)
-endif # HAVE_MKINITCPIO
-
 if HAVE_PLYMOUTH
 TESTS += $(TESTS_PLYMOUTH)
 endif # HAVE_PLYMOUTH
 endif #INTEGRATION
 TESTS_SHELL = test/libtpm2-totp.sh \
               test/tpm2-totp.sh
-TESTS_MKINITCPIO = test/mkinitcpio-tpm2-totp.sh
 TESTS_PLYMOUTH = test/plymouth-tpm2-totp.sh
-EXTRA_DIST += $(TESTS_SHELL) $(TESTS_MKINITCPIO) $(TESTS_PLYMOUTH)
+EXTRA_DIST += $(TESTS_SHELL) $(TESTS_PLYMOUTH)
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(srcdir)/test/sh_log_compiler.sh
 EXTRA_DIST += $(SH_LOG_COMPILER)
@@ -180,6 +175,8 @@ endif # HAVE_DOXYGEN
 
 ### initramfs hooks ###
 
+EXTRA_DIST += dist/show-tpm2-totp
+
 if HAVE_DRACUT
 if HAVE_PLYMOUTH
 dracut_SCRIPTS = dist/dracut/module-setup.sh dist/dracut/tpm2-totp.sh
@@ -197,6 +194,7 @@ endif # HAVE_INITRAMFSTOOLS
 EXTRA_DIST += dist/initramfs-tools/scripts/init-premount/tpm2-totp
 
 if HAVE_MKINITCPIO
+helpers_SCRIPTS = dist/show-tpm2-totp
 initcpio_install_DATA = dist/initcpio/install/tpm2-totp
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
 if HAVE_PLYMOUTH

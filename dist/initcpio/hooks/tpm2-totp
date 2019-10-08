@@ -1,13 +1,12 @@
 #!/usr/bin/ash
 
 run_hook() {
-    echo 'Verify the TOTP (press any key to continue):'
-    tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
-    echo
-    while ! read -n 1 -r -s -t 10; do
-        tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} --time calculate
-        echo
-    done
+    show-tpm2-totp ${tpm2_totp_nvindex:+--nvindex "$tpm2_totp_nvindex"} &
+    show_tpm2_totp_pid=$!
+}
+
+run_cleanuphook() {
+    kill "$show_tpm2_totp_pid" 2>/dev/null
 }
 
 # vim: set ft=sh ts=4 sw=4 et:

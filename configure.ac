@@ -191,11 +191,6 @@ AS_IF([test "x$enable_integration" != xno],
               AS_IF([test "x$timeout" != xyes],
                     [AC_MSG_ERROR([Integration tests require the timeout executable])])
              ])
-
-       AM_COND_IF([HAVE_MKINITCPIO],
-                  [AS_IF([test "x$mkinitcpio" != xyes],
-                         [AC_MSG_ERROR([Integration tests require mkinitcpio to be installed])])
-                  ])
       ])
 
 AC_OUTPUT
