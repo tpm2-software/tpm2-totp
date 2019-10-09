@@ -13,7 +13,8 @@ check() {
 
 install() {
     inst_libdir_file 'libtss2-tcti-device.so*'
-    if dracut_module_included "plymouth"; then
+    if dracut_module_included "plymouth" && \
+       find_binary @HELPERSDIR@/plymouth-tpm2-totp; then
         inst @HELPERSDIR@/plymouth-tpm2-totp /bin/show-tpm2-totp
         inst_library @PLYMOUTHPLUGINSDIR@/label.so
         inst_simple "$(fc-match --format '%{file}')"
