@@ -197,7 +197,7 @@ AC_OUTPUT
 
 AC_MSG_RESULT([
 $PACKAGE_NAME $VERSION
-    doxygen:         $DOXYGEN
+    doxygen:         $DX_DOXYGEN
     pandoc:          $PANDOC
     dracut:          $with_dracutmodulesdir
     initramfs-tools: $with_initramfstoolsdir
