@@ -201,7 +201,4 @@ initcpio_install_DATA += dist/initcpio/install/plymouth-tpm2-totp
 initcpio_hooks_DATA += dist/initcpio/hooks/plymouth-tpm2-totp
 endif # HAVE_PLYMOUTH
 endif # HAVE_MKINITCPIO
-EXTRA_DIST += \
-	dist/initcpio/install/tpm2-totp \
-	dist/initcpio/hooks/tpm2-totp \
-	dist/initcpio/hooks/plymouth-tpm2-totp
+EXTRA_DIST += dist/initcpio/hooks/tpm2-totp dist/initcpio/hooks/plymouth-tpm2-totp
