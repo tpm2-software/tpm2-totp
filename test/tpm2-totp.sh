@@ -5,6 +5,13 @@
 
 set -eufx
 
+exit_status=0
+tpm2-totp invalid-argument || exit_status=$?
+if [ "$exit_status" -ne 1 ]; then
+	echo "tpm2-totp should have exit status 1 on invalid arguments!"
+	exit 1
+fi
+
 tpm2-totp -P abc -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
 
 # Changing an unselected PCR bank should not affect the TOTP calculation

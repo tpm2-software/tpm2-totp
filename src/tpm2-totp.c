@@ -304,10 +304,6 @@ qrencode(const char *url)
 int
 main(int argc, char **argv)
 {
-    if (parse_opts(argc, argv) != 0) {
-        goto err;
-    }
-
     int rc;
     uint8_t *secret, *keyBlob, *newBlob;
     size_t secret_size, keyBlob_size, newBlob_size;
@@ -316,7 +312,11 @@ main(int argc, char **argv)
     time_t now;
     struct tm now_local;
     char timestr[100] = { 0, };
-    TSS2_TCTI_CONTEXT *tcti_context;
+    TSS2_TCTI_CONTEXT *tcti_context = NULL;
+
+    if (parse_opts(argc, argv) != 0) {
+        goto err;
+    }
 
     if (!opt.tcti) {
         opt.tcti = getenv(TPM2TOTP_ENV_TCTI);
