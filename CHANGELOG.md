@@ -4,15 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.0_rc1] - 2019-10-15
-### Changed
-- Install dracut module if plymouth is not available.
-
-### Fixed
-- Fix segfault when calling tpm2-totp with invalid arguments.
-- Minor fixes for the build system.
-
-## [0.2.0_rc0] - 2019-10-09
+## [0.2.0] - 2019-10-22
 ### Added
 - pkg-config file for libtpm2-totp.
 - New option `-T`/`--tcti` to specify the TCTI to be used.
