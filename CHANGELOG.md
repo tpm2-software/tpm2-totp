@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1_rc0] - 2019-12-14
+### Fixed
+- Fix `show-tpm2-totp` installation location when using dracut without plymouth.
+- Add missing include `endian.h` to improve portability.
+
 ## [0.2.0] - 2019-10-22
 ### Added
 - pkg-config file for libtpm2-totp.
