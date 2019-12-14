@@ -8,6 +8,7 @@
 
 #include <tpm2-totp.h>
 
+#include <endian.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
