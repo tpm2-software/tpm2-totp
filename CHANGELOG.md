@@ -4,14 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.2.1_rc1] - 2019-12-22
-### Fixed
-- Fix warning for dracut udev rule.
-
-## [0.2.1_rc0] - 2019-12-14
+## [0.2.1] - 2019-12-28
 ### Fixed
 - Fix `show-tpm2-totp` installation location when using dracut without plymouth.
 - Add missing include `endian.h` to improve portability.
+- Fix warning for dracut udev rule.
 
 ## [0.2.0] - 2019-10-22
 ### Added
