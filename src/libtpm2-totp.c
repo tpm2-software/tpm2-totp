@@ -106,6 +106,7 @@ TPM2B_AUTH emptyAuth = { .size = 0, };
  * @param[out] keyBlob_size Size of the generated key.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
@@ -319,6 +320,8 @@ error:
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
  * @retval -10 on empty password.
+ * @retval -20 when no password-protected recovery copy of the secret has been stored.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
@@ -395,7 +398,7 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
 
     if (off == keyBlob_size) {
         dbg("No unseal blob included.");
-        return -1;
+        return -20;
     }
 
     rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off,
@@ -544,6 +547,7 @@ error:
  * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_storeKey_nv(const uint8_t *keyBlob, size_t keyBlob_size, uint32_t nv,
@@ -614,6 +618,7 @@ error:
  * @param[out] keyBlob_size Size of the key.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_loadKey_nv(uint32_t nv, TSS2_TCTI_CONTEXT *tcti_context,
@@ -671,6 +676,7 @@ error:
  * @param[in] tcti_context Optional TCTI context to select TPM to use.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_deleteKey_nv(uint32_t nv, TSS2_TCTI_CONTEXT *tcti_context)
@@ -716,6 +722,7 @@ error:
  * @param[out] otp Calculated TOTP.
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
@@ -872,6 +879,8 @@ error:
  * @retval 0 on success.
  * @retval -1 on undefined/general failure.
  * @retval -10 on empty password.
+ * @retval -20 when no password-protected recovery copy of the secret has been stored.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
  */
 int
 tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
@@ -905,7 +914,7 @@ tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
 
     if (off == keyBlob_size) {
         dbg("No unseal blob included.");
-        return -1;
+        return -20;
     }
 
     rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, &keyPublic);
