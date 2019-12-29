@@ -80,14 +80,14 @@ bin_PROGRAMS += tpm2-totp
 
 tpm2_totp_SOURCES = src/tpm2-totp.c
 tpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(QRENCODE_CFLAGS)
-tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(QRENCODE_LIBS) -ldl libtpm2-totp.la
+tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(QRENCODE_LIBS) libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
 if HAVE_PLYMOUTH
 helpers_PROGRAMS += plymouth-tpm2-totp
 plymouth_tpm2_totp_SOURCES = src/plymouth-tpm2-totp.c
 plymouth_tpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(PLY_BOOT_CLIENT_CFLAGS)
-plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(PLY_BOOT_CLIENT_LIBS) -ldl libtpm2-totp.la
+plymouth_tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(PLY_BOOT_CLIENT_LIBS) libtpm2-totp.la
 plymouth_tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 endif # HAVE_PLYMOUTH
 
@@ -114,7 +114,7 @@ check_PROGRAMS += libtpm2-totp
 
 libtpm2_totp_SOURCES = test/libtpm2-totp.c
 libtpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(OATH_CFLAGS)
-libtpm2_totp_LDADD = $(AM_LDADD)  $(TSS2_TCTILDR_LIBS) $(OATH_LIBS) -ldl libtpm2-totp.la
+libtpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(OATH_LIBS) libtpm2-totp.la
 libtpm2_totp_LDFLAGS = $(AM_LDFLAGS) $(OATH_LDFLAGS)
 endif #INTEGRATION
 
