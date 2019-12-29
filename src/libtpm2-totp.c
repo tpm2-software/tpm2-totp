@@ -27,10 +27,13 @@
 
 const TPM2B_DIGEST ownerauth = { .size = 0 };
 
+#ifdef NDEBUG
+#define dbg(m, ...)
+#else
 #define dbg(m, ...) fprintf(stderr, m "\n", ##__VA_ARGS__)
+#endif
 
-#define chkrc(rc, cmd) if (rc != TSS2_RC_SUCCESS) {\
-    dbg("ERROR in %s (%s:%i): 0x%08x\n", __func__, __FILE__, __LINE__, rc); cmd; }
+#define chkrc(rc, cmd) if (rc != TSS2_RC_SUCCESS) { cmd; }
 
 #define TPM2B_PUBLIC_PRIMARY_TEMPLATE { .size = 0, \
     .publicArea = { \
