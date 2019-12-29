@@ -15,12 +15,19 @@
 #include <getopt.h>
 #include <qrencode.h>
 #include <tss2/tss2_tctildr.h>
+#include <tss2/tss2_rc.h>
 
 #define VERB(...) if (opt.verbose) fprintf(stderr, __VA_ARGS__)
 #define ERR(...) fprintf(stderr, __VA_ARGS__)
 
 #define chkrc(rc, cmd) if (rc != TSS2_RC_SUCCESS) {\
-    ERR("ERROR in %s (%s:%i): 0x%08x\n", __func__, __FILE__, __LINE__, rc); cmd; }
+    const char* error_text = decode_totp_rc(rc); \
+    if (error_text) {\
+        ERR("%s\n", error_text);\
+    } else {\
+        ERR("ERROR in %s (%s:%i): 0x%x - %s\n", __func__, __FILE__, __LINE__, rc, Tss2_RC_Decode(rc));\
+    }\
+    cmd; }
 
 #define TPM2TOTP_ENV_TCTI "TPM2TOTP_TCTI"
 
@@ -61,6 +68,36 @@ static struct opt {
     char *tcti;
     int verbose;
 } opt;
+
+const char*
+decode_totp_rc(int rc)
+{
+    switch(rc) {
+        case -10:
+            return "No recovery password for the TOTP secret was given.";
+            break;
+        case -20:
+            return "The TOTP secret has not been stored with a recovery password and thus cannot be retrieved.";
+            break;
+        case TPM2_RC_NV_DEFINED:
+            return "A TOTP secret is already stored, use 'calculate' to calculate the TOTP or 'clean' to delete it.";
+            break;
+        case (TPM2_RC_HANDLE | TPM2_RC_1):
+            return "No TOTP secret is currently stored, use 'generate' to generate one.";
+            break;
+        case (TPM2_RC_POLICY_FAIL | TPM2_RC_9):
+            return "The system state has changed, no TOTP could be calculated.";
+            break;
+        case (TPM2_RC_AUTH_FAIL | TPM2_RC_9):
+            return "Wrong recovery password for the TOTP secret.";
+            break;
+        case TPM2_RC_LOCKOUT:
+            return "The password has been entered wrongly too many times and the TPM is in lockout mode.";
+            break;
+        default:
+            return NULL;
+    }
+}
 
 int
 parse_banks(char *str, int *banks)
@@ -137,7 +174,7 @@ parse_opts(int argc, char **argv)
     opt.cmd = CMD_NONE;
     opt.banks = 0;
     opt.nvindex = 0;
-    opt.password = NULL;
+    opt.password = "";
     opt.pcrs = 0;
     opt.time = 0;
     opt.verbose = 0;

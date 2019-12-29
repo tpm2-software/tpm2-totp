@@ -79,8 +79,8 @@ pkgconfig_DATA = dist/tpm2-totp.pc
 bin_PROGRAMS += tpm2-totp
 
 tpm2_totp_SOURCES = src/tpm2-totp.c
-tpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(QRENCODE_CFLAGS)
-tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(QRENCODE_LIBS) libtpm2-totp.la
+tpm2_totp_CFLAGS = $(AM_CFLAGS) $(TSS2_TCTILDR_CFLAGS) $(TSS2_RC_CFLAGS) $(QRENCODE_CFLAGS)
+tpm2_totp_LDADD = $(AM_LDADD) $(TSS2_TCTILDR_LIBS) $(TSS2_RC_LIBS) $(QRENCODE_LIBS) libtpm2-totp.la
 tpm2_totp_LDFLAGS = $(AM_LDFLAGS)
 
 if HAVE_PLYMOUTH
