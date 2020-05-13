@@ -264,37 +264,104 @@ base32enc(const uint8_t *in, size_t in_size) {
 	return (char *)r;
 }
 
-char *
+static int unicode_output = 1;
+static const int margin = 1;
+
+static const char * utf8(int cp)
+{
+    static unsigned char buf[4];
+
+    buf[0] = 0xE0 | ((cp >> 12) & 0x0F);
+    buf[1] = 0x80 | ((cp >>  6) & 0x3F);
+    buf[2] = 0x80 | ((cp >>  0) & 0x3F);
+    buf[3] = '\0';
+
+    return (const char*) buf;
+}
+
+
+static const char * block(int cp)
+{
+    if (unicode_output)
+    {
+        if (cp == 0)
+            return utf8(0x2588);
+        if (cp == 1)
+            return utf8(0x2580);
+        if (cp == 2)
+            return utf8(0x2584);
+        if (cp == 3)
+            return " ";
+    } else {
+        // code page whatever
+        if (cp == 0) return "\xDB";
+        if (cp == 1) return "\xDC";
+        if (cp == 2) return "\xDF";
+        if (cp == 3) return " ";
+    }
+
+    return "--?";
+}
+
+
+static int
+writeANSI(
+    const QRcode * const qrcode,
+    FILE * fp
+)
+{
+    /* raw data */
+    const uint8_t * const p = qrcode->data;
+
+    for(int y=0 ; y < margin ; y++)
+    {
+        for(int x=0; x < qrcode->width + 4 * margin; x++)
+            fputs(block(0), fp);
+        fputs("\n", fp);
+    }
+
+    for(int y=0; y < qrcode->width; y += 2)
+    {
+        const uint8_t * const row0 = p + (y+0)*qrcode->width;
+        const uint8_t * const row1 = p + (y+1)*qrcode->width;
+
+        for(int x=0; x < margin*2; x++ )
+            fputs(block(0), fp);
+
+        for(int x=0; x < qrcode->width; x++)
+        {
+            int r0 = row0[x] & 0x1;
+            int r1 = y < qrcode->width-1 ? row1[x] & 0x1 : 0;
+
+            fputs(block(r0 << 1 | r1 << 0), fp);
+        }
+
+        for(int x=0; x < margin*2; x++ )
+            fputs(block(0), fp);
+
+        fputs("\n", fp);
+    }
+
+    /* bottom margin; only do a half block on the last one */
+    for(int y=0 ; y < margin ; y++)
+    {
+        for(int x=0; x < qrcode->width + 4 * margin; x++)
+            fputs(block(1), fp);
+        fputs("\n", fp);
+    }
+
+    return 0;
+}
+
+int
 qrencode(const char *url)
 {
     QRcode *qrcode = QRcode_encodeString(url, 0/*=version*/, QR_ECLEVEL_L,
                                          QR_MODE_8, 1/*=case*/);
-    if (!qrcode) { ERR("QRcode failed."); return NULL; }
+    if (!qrcode) { ERR("QRcode failed."); return -1; }
 
-    char *qrpic = malloc(/* Margins top / bot*/ 2 * (
-                            (qrcode->width+2) * 2 - 2 +
-                            strlen("\033[47m%*s\033[0m\n") ) +
-                         /* lines */ qrcode->width * (
-                            strlen("\033[47m  ") * (qrcode->width + 1) +
-                            strlen("\033[47m  \033[0m\n")
-                         ) + 1 /* \0 */);
-    size_t idx = 0;
-    idx += sprintf(&qrpic[idx], "\033[47m%*s\033[0m\n", 2*(qrcode->width+2), "");
-    for (int y = 0; y < qrcode->width; y++) {
-        idx += sprintf(&qrpic[idx], "\033[47m  ");
-        for (int x = 0; x < qrcode->width; x++) {
-            if (qrcode->data[y*qrcode->width + x] & 0x01) {
-                idx += sprintf(&qrpic[idx], "\033[40m  ");
-            } else {
-                idx += sprintf(&qrpic[idx], "\033[47m  ");
-            }
-        }
-        idx += sprintf(&qrpic[idx], "\033[47m  \033[0m\n");
-    }
-    idx += sprintf(&qrpic[idx], "\033[47m%*s\033[0m\n", 2*(qrcode->width+2), "");
-    (void)(idx);
-    free(qrcode);
-    return qrpic;
+    writeANSI(qrcode, stdout);
+    return 0;
 }
 
 #define URL_PREFIX "otpauth://totp/%s?secret="
@@ -315,15 +382,9 @@ tpm2totp_qrencode(
     snprintf(url, url_len, URL_PREFIX "%s", totp_name, base32key);
     free((void*) base32key);
 
-    const char * const qrpic = qrencode(url);
-    if (!qrpic) {
-        free((void*) url);
-        return -1;
-    }
+    qrencode(url);
 
-    printf("%s\n", qrpic);
     printf("%s\n", url);
-    free((void*) qrpic);
     free((void*) url);
     return 0;
 }
