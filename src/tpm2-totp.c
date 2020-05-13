@@ -34,10 +34,11 @@ char *help =
     "    -p, --pcrs      Selected PCR registers (default: 0,2,4,6)\n"
     "    -t, --time      Show the time used for calculation\n"
     "    -T, --tcti      TCTI to use\n"
+    "    -l, --label     Hostname to use for the TOTP label\n"
     "    -v, --verbose   print verbose messages\n"
     "\n";
 
-static const char *optstr = "hb:N:P:p:tT:v";
+static const char *optstr = "hb:N:P:p:tT:l:v";
 
 static const struct option long_options[] = {
     {"help",     no_argument,       0, 'h'},
@@ -47,6 +48,7 @@ static const struct option long_options[] = {
     {"pcrs",     required_argument, 0, 'p'},
     {"time",     no_argument,       0, 't'},
     {"tcti",     required_argument, 0, 'T'},
+    {"label",    required_argument, 0, 'l'},
     {"verbose",  no_argument,       0, 'v'},
     {0,          0,                 0,  0 }
 };
@@ -59,6 +61,7 @@ static struct opt {
     int pcrs;
     int time;
     char *tcti;
+    char *label;
     int verbose;
 } opt;
 
@@ -141,6 +144,7 @@ parse_opts(int argc, char **argv)
     opt.pcrs = 0;
     opt.time = 0;
     opt.verbose = 0;
+    opt.label = "TPM2-TOTP";
 
     /* parse the options */
     int c;
@@ -178,6 +182,9 @@ parse_opts(int argc, char **argv)
             break;
         case 'T':
             opt.tcti = optarg;
+            break;
+        case 'l':
+            opt.label = optarg;
             break;
         case 'v':
             opt.verbose = 1;
@@ -290,7 +297,36 @@ qrencode(const char *url)
     return qrpic;
 }
 
-#define URL_PREFIX "otpauth://totp/TPM2-TOTP?secret="
+#define URL_PREFIX "otpauth://totp/%s?secret="
+
+static int
+tpm2totp_qrencode(
+    const char * const totp_name,
+    const uint8_t * const secret,
+    const size_t secret_size
+)
+{
+    const char * const base32key = base32enc(secret, secret_size);
+    const size_t url_len = 1
+        + strlen(base32key)
+        + strlen(totp_name)
+        + strlen(URL_PREFIX);
+    char * const url = calloc(1, url_len);
+    snprintf(url, url_len, URL_PREFIX "%s", totp_name, base32key);
+    free((void*) base32key);
+
+    const char * const qrpic = qrencode(url);
+    if (!qrpic) {
+        free((void*) url);
+        return -1;
+    }
+
+    printf("%s\n", qrpic);
+    printf("%s\n", url);
+    free((void*) qrpic);
+    free((void*) url);
+    return 0;
+}
 
 /** Main function
  *
@@ -307,7 +343,6 @@ main(int argc, char **argv)
     int rc;
     uint8_t *secret, *keyBlob, *newBlob;
     size_t secret_size, keyBlob_size, newBlob_size;
-    char *base32key, *url, *qrpic;
     uint64_t totp;
     time_t now;
     struct tm now_local;
@@ -336,21 +371,9 @@ main(int argc, char **argv)
         free(keyBlob);
         chkrc(rc, goto err);
 
-        base32key = base32enc(secret, secret_size);
-        url = calloc(1, strlen(base32key) + strlen(URL_PREFIX) + 1);
-        sprintf(url, URL_PREFIX "%s", base32key);
-        free(base32key);
-
-        qrpic = qrencode(url);
-        if (!qrpic) {
-            free(url);
+	if (tpm2totp_qrencode(opt.label, secret, secret_size) < 0)
             goto err;
-        }
 
-        printf("%s\n", qrpic);
-        printf("%s\n", url);
-        free(qrpic);
-        free(url);
         break;
     case CMD_CALCULATE:
         rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context, &keyBlob, &keyBlob_size);
@@ -395,17 +418,9 @@ main(int argc, char **argv)
         free(keyBlob);
         chkrc(rc, goto err);
 
-        base32key = base32enc(secret, secret_size);
-        url = calloc(1, strlen(base32key) + strlen(URL_PREFIX) + 1);
-        sprintf(url, URL_PREFIX "%s", base32key);
-        free(base32key);
+	if (tpm2totp_qrencode(opt.label, secret, secret_size) < 0)
+            goto err;
 
-        qrpic = qrencode(url);
-
-        printf("%s\n", qrpic);
-        printf("%s\n", url);
-        free(qrpic);
-        free(url);
         break;
     case CMD_CLEAN:
         //TODO: Are your sure ?
