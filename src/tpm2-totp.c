@@ -266,25 +266,25 @@ qrencode(const char *url)
 
     char *qrpic = malloc(/* Margins top / bot*/ 2 * (
                             (qrcode->width+2) * 2 - 2 +
-                            strlen("\033[47m%*s\033[0m\n") ) +
+                            strlen("\e[47m%*s\e[0m\n") ) +
                          /* lines */ qrcode->width * (
-                            strlen("\033[47m  ") * (qrcode->width + 1) +
-                            strlen("\033[47m  \033[0m\n")
+                            strlen("\e[47m  ") * (qrcode->width + 1) +
+                            strlen("\e[47m  \e[0m\n")
                          ) + 1 /* \0 */);
     size_t idx = 0;
-    idx += sprintf(&qrpic[idx], "\033[47m%*s\033[0m\n", 2*(qrcode->width+2), "");
+    idx += sprintf(&qrpic[idx], "\e[47m%*s\e[0m\n", 2*(qrcode->width+2), "");
     for (int y = 0; y < qrcode->width; y++) {
-        idx += sprintf(&qrpic[idx], "\033[47m  ");
+        idx += sprintf(&qrpic[idx], "\e[47m  ");
         for (int x = 0; x < qrcode->width; x++) {
             if (qrcode->data[y*qrcode->width + x] & 0x01) {
-                idx += sprintf(&qrpic[idx], "\033[40m  ");
+                idx += sprintf(&qrpic[idx], "\e[40m  ");
             } else {
-                idx += sprintf(&qrpic[idx], "\033[47m  ");
+                idx += sprintf(&qrpic[idx], "\e[47m  ");
             }
         }
-        idx += sprintf(&qrpic[idx], "\033[47m  \033[0m\n");
+        idx += sprintf(&qrpic[idx], "\e[47m  \e[0m\n");
     }
-    idx += sprintf(&qrpic[idx], "\033[47m%*s\033[0m\n", 2*(qrcode->width+2), "");
+    idx += sprintf(&qrpic[idx], "\e[47m%*s\e[0m\n", 2*(qrcode->width+2), "");
     (void)(idx);
     free(qrcode);
     return qrpic;
