@@ -16,7 +16,7 @@
 
 For the integration test suite:
 * liboath
-* tpm_server
+* [swtpm](https://github.com/stefanberger/swtpm) or [tpm_server](https://sourceforge.net/projects/ibmswtpm2/)
 * realpath
 * ss
 

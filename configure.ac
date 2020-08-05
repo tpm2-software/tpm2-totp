@@ -167,9 +167,10 @@ AC_ARG_ENABLE([integration],
 AM_CONDITIONAL([INTEGRATION], [test "x$enable_integration" != xno])
 AS_IF([test "x$enable_integration" != xno],
       [PKG_CHECK_MODULES([OATH],[liboath])
+       AC_CHECK_PROG([swtpm], [swtpm], [yes])
        AC_CHECK_PROG([tpm_server], [tpm_server], [yes])
-       AS_IF([test "x$tpm_server" != xyes],
-             [AC_MSG_ERROR([Integration tests require the tpm_server executable])])
+       AS_IF([test "x$swtpm" != xyes && test "x$tpm_server" != xyes],
+             [AC_MSG_ERROR([Integration tests require either the swtpm or the tpm_server executable])])
        AC_CHECK_PROG([realpath], [realpath], [yes])
        AS_IF([test "x$realpath" != xyes],
              [AC_MSG_ERROR([Integration tests require the realpath executable])])
