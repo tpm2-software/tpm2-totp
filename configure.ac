@@ -5,7 +5,7 @@
 AC_PREREQ([2.68])
 
 AC_INIT([tpm2-totp],
-        [0.3.0_dev],
+        [0.3.0_rc0],
         [https://github.com/tpm2-software/tpm2-totp/issues],
         [],
         [https://github.com/tpm2-software/tpm2-totp])
