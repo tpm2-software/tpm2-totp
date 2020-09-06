@@ -36,12 +36,12 @@ char *help =
     "Options:\n"
     "    -h, --help      print help\n"
     "    -b, --banks     Selected PCR banks (default: SHA1,SHA256)\n"
+    "    -l, --label     Label to use for display in the TOTP authenticator app (default: TPM2-TOTP)\n"
     "    -N, --nvindex   TPM NV index to store data (default: 0x018094AF)\n"
     "    -P, --password  Password for recovery/resealing (default: None)\n"
     "    -p, --pcrs      Selected PCR registers (default: 0,2,4,6)\n"
     "    -t, --time      Show the time used for calculation\n"
     "    -T, --tcti      TCTI to use\n"
-    "    -l, --label     Hostname to use for the TOTP label\n"
     "    -v, --verbose   print verbose messages\n"
     "\n";
 
