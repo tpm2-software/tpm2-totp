@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.0-rc0] - 2020-09-03
+## [0.3.0] - 2020-09-13
 ### Added
 - New option `--label` to specify the label to use in the TOTP authenticator app.
 - User-friendly error messages for common error conditions.
