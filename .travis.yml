@@ -12,6 +12,7 @@ env:
   - PATH="${PWD}/installdir/usr/local/bin:${PATH}"
   - PKG_CONFIG_PATH="${PWD}/installdir/usr/local/lib/pkgconfig:/usr/lib/pkgconfig"
   - LD_LIBRARY_PATH="${PWD}/installdir/usr/local/lib:/usr/lib"
+  - ACLOCAL_PATH="${PWD}/installdir/usr/local/share/aclocal"
 
 addons:
   apt:
@@ -30,35 +31,40 @@ addons:
     - plymouth
     - fakeroot
     - doxygen
+    - libjson-c-dev
+    - libtasn1-dev
+    - expect
+    - socat
+    - python3-setuptools
+    - libseccomp-dev
 
 install:
   - git clean -xdf
   - mkdir -p installdir/usr/local/bin
 # TPM Simulator
-  - wget --no-check-certificate https://download.01.org/tpm2/ibmtpm974.tar.gz
-    # we skip failing cert check and use the sha256sum instead
-  - sha256sum ibmtpm974.tar.gz | grep -q ^8e45d86129a0adb95fee4cee51f4b1e5b2d81ed3e55af875df53f98f39eb7ad7 || travis_terminate 1
-  - mkdir ibmtpm
-  - tar axf ibmtpm974.tar.gz -C ibmtpm
-  - make -C ibmtpm/src -j$(nproc)
-  - cp ibmtpm/src/tpm_server installdir/usr/local/bin
-  - which tpm_server
+  - git clone --branch=v0.7.3 --depth=1 https://github.com/stefanberger/libtpms.git
+  - pushd libtpms
+  - autoreconf --install --force
+  - ./configure --prefix="$PWD/../installdir/usr/local" --with-openssl --with-tpm2
+  - make -j$(nproc) install
+  - popd
+  - git clone --branch=v0.4.1 --depth=1 https://github.com/stefanberger/swtpm.git
+  - pushd swtpm
+  - autoreconf --install --force
+  - ./configure --prefix="$PWD/../installdir/usr/local"
+  - make -j$(nproc) install
+  - popd
 # Autoconf archives
-  - wget --no-check-certificate https://download.01.org/tpm2/autoconf-archive-2017.09.28.tar.xz
-    # we skip failing cert check and use the sha256sum instead
-  - sha256sum autoconf-archive-2017.09.28.tar.xz | grep -q 5c9fb5845b38b28982a3ef12836f76b35f46799ef4a2e46b48e2bd3c6182fa01 || travis_terminate 1
-  - tar xJf autoconf-archive-2017.09.28.tar.xz
-  - cp autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
-  - cp autoconf-archive-2017.09.28/m4/ax_prog_doxygen.m4 m4/
-  - cp autoconf-archive-2017.09.28/m4/ax_is_release.m4 m4/
-  - cp autoconf-archive-2017.09.28/m4/ax_add_fortify_source.m4 m4/
+  - wget https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2019.01.06.tar.xz
+  - sha256sum autoconf-archive-2019.01.06.tar.xz | grep -q 17195c833098da79de5778ee90948f4c5d90ed1a0cf8391b4ab348e2ec511e3f || travis_terminate 1
+  - tar xJf autoconf-archive-2019.01.06.tar.xz
+  - pushd autoconf-archive-2019.01.06
+  - ./configure --prefix="$PWD/../installdir/usr/local"
+  - make -j$(nproc) install
+  - popd
 # TPM2-TSS
-  - git clone --depth=1 -b 2.3.x https://github.com/tpm2-software/tpm2-tss.git
+  - git clone --depth=1 -b 3.0.x https://github.com/tpm2-software/tpm2-tss.git
   - pushd tpm2-tss
-  - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
-  - cp ../autoconf-archive-2017.09.28/m4/ax_prog_doxygen.m4 m4/
-  - cp ../autoconf-archive-2017.09.28/m4/ax_is_release.m4 m4/
-  - cp ../autoconf-archive-2017.09.28/m4/ax_add_fortify_source.m4 m4/
   - ./bootstrap
   - ./configure --prefix=${PWD}/../installdir/usr/local --disable-doxygen-doc
   - make -j$(nproc)
@@ -66,13 +72,12 @@ install:
   - rm ${PWD}/../installdir/usr/local/lib/*.la
   - popd
 # tpm2-tools
-  - git clone --depth=1 -b 3.X https://github.com/tpm2-software/tpm2-tools.git
+  - git clone --depth=1 -b 4.X https://github.com/tpm2-software/tpm2-tools.git
   - pushd tpm2-tools
   - mkdir m4 || true
-  - cp ../autoconf-archive-2017.09.28/m4/ax_code_coverage.m4 m4/
   - ./bootstrap
   # Some workarounds for tpm2-tools with -Wno-XXX
-  - ./configure --disable-hardening CFLAGS="-I${PWD}/../installdir/usr/local/include -Wno-unused-value -Wno-missing-field-initializer" LDFLAGS=-L${PWD}/../installdir/usr/local/lib --prefix=${PWD}/../installdir/usr/local
+  - ./configure --disable-hardening CFLAGS="-I${PWD}/../installdir/usr/local/include -Wno-unused-value -Wno-missing-field-initializer" LDFLAGS=-L${PWD}/../installdir/usr/local/lib --prefix=${PWD}/../installdir/usr/local --with-bashcompdir=${PWD}/../installdir/usr/local/share/bash-completion/completions
   - make -j$(nproc)
   - make install
   - popd
