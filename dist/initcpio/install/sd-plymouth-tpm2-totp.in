@@ -1,0 +1,50 @@
+#!/bin/bash
+
+build() {
+    local mod
+
+    if [[ $TPM_MODULES ]]; then
+        for mod in $TPM_MODULES; do
+            add_module "$mod"
+        done
+    else
+        add_all_modules /tpm/
+    fi
+
+    add_binary @PLYMOUTHPLUGINSDIR@/label.so
+    add_file "$(fc-match --format '%{file}')"
+
+    add_systemd_unit plymouth-tpm2-totp.service
+    add_file @UDEVDIR@/rules.d/*tpm-udev.rules
+    add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so.0
+}
+
+help() {
+    cat <<HELPEOF
+This hook uses plymouth to display a time-based one-time password (TOTP) sealed
+to a Trusted Platform Module (TPM) to ensure that the boot process has not been
+tampered with. To set this up, a secret needs to be generated first and sealed
+to the TPM using
+
+tpm2-totp generate
+
+This stores the secret in the TPM and displays it to the user so that it can
+be recorded on a different device (e.g. a TOTP app). When the hook is run, the
+TOTP is calculated and displayed using plymouth so that it can be compared with
+the output of the second device. This will only be successful and show a
+matching output if the boot process has not changed (new UEFI firmware,
+different boot loader, ...).
+
+Note that calculating the TOTP requires some entropy, which might be scarce
+directly after startup. If the boot process appears to be stuck, it might help
+to press some random keys to gather more entropy. A better alternative on modern
+processors is to enable the use of the hardware random number generator (RNG)
+by adding
+
+random.trust_cpu=on
+
+to the kernel command line.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:
