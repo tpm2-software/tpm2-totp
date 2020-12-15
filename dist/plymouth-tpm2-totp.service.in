@@ -1,0 +1,12 @@
+[Unit]
+Description=Display a TOTP during boot using Plymouth
+Requires=plymouth-start.service dev-tpm0.device
+After=plymouth-start.service dev-tpm0.device
+DefaultDependencies=no
+
+[Service]
+Type=exec
+ExecStart=@HELPERSDIR@/plymouth-tpm2-totp
+
+[Install]
+WantedBy=sysinit.target

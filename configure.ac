@@ -161,6 +161,19 @@ AM_COND_IF([HAVE_PLYMOUTH],
                   [AC_MSG_ERROR([plymouth requested but not found])])
            ])
 
+AC_ARG_WITH([udevdir],
+            AS_HELP_STRING([--with-udevdir=DIR], [udev directory]),,
+            [PKG_CHECK_VAR([with_udevdir], [udev], [udevdir],, [with_udevdir="$libdir/udev"])])
+AC_SUBST([UDEVDIR], [$with_udevdir])
+
+AC_ARG_WITH([systemdsystemunitdir],
+            AS_HELP_STRING([--with-systemdsystemunit=DIR], [systemd system unit directory]),,
+            [PKG_CHECK_VAR([with_systemdsystemunitdir], [systemd], [systemdsystemunitdir],,
+                           [with_systemdsystemunitdir="$libdir/systemd/system"])])
+AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
+
+AC_CONFIG_FILES([dist/initcpio/install/sd-plymouth-tpm2-totp dist/plymouth-tpm2-totp.service])
+
 AC_ARG_ENABLE([integration],
             [AS_HELP_STRING([--enable-integration],
                             [build integration tests against TPM])],,
