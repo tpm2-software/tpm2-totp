@@ -46,7 +46,7 @@ main(int argc, char **argv)
 
     rc = tpm2totp_calculate(keyBlob, keyBlob_size, tcti_context, &now, &totp);
     chkrc(rc, goto err);
-    snprintf(&totp_string[0], 7, "%.*ld", 6, totp);
+    snprintf(&totp_string[0], 7, "%.*" PRIu64, 6, totp);
 
     rc = oath_totp_generate((char *)secret, secret_size, now, 30, 0, 6, &totp_check[0]);
     chkrc(rc, goto err);
@@ -63,7 +63,7 @@ main(int argc, char **argv)
 
     rc = tpm2totp_calculate(newBlob, newBlob_size, tcti_context, &now, &totp);
     chkrc(rc, goto err);
-    snprintf(&totp_string[0], 7, "%.*ld", 6, totp);
+    snprintf(&totp_string[0], 7, "%.*" PRIu64, 6, totp);
 
     rc = oath_totp_generate((char *)secret, secret_size, now, 30, 0, 6, &totp_check[0]);
     chkrc(rc, goto err);
