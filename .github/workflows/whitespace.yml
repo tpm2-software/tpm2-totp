@@ -1,0 +1,13 @@
+name: Whitespace Checker
+on: pull_request
+jobs:
+  whitespace-test:
+    runs-on: ubuntu-latest
+    if: "!contains(github.ref, 'coverity_scan')"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Perform Whitespace Check
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git fetch origin "$BASE_REF" && git diff --check "origin/$BASE_REF"

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# SPDX-License-Identifier: BSD-2
+
+set -exo pipefail
+
+$DOCKER_BUILD_DIR/.ci/get_deps.sh "$(dirname $DOCKER_BUILD_DIR)"
+
+pushd $DOCKER_BUILD_DIR
+
+SCAN_PREFIX=""
+CONFIGURE_OPTIONS=""
+
+if [ -d build ]; then
+  rm -rf build
+fi
+
+./bootstrap
+
+mkdir build
+pushd build
+
+if [ -z "$CC" -o "$CC" == "gcc" ]; then
+  export CONFIGURE_OPTIONS+=" --disable-defaultflags --enable-code-coverage";
+else
+  export SCAN_PREFIX="scan-build --status-bugs"
+fi
+
+$SCAN_PREFIX ../configure $CONFIGURE_OPTIONS --enable-integration
+$SCAN_PREFIX make -j$(nproc)
+
+make -j$(nproc) check
+cat test-suite.log config.log
+../configure $CONFIGURE_OPTIONS
+make -j$(nproc) distcheck
+cat config.log
+popd
+
+popd
