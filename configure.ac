@@ -26,8 +26,6 @@ AC_CONFIG_AUX_DIR([build-aux])
 # propagate configure arguments to distcheck
 AC_SUBST([DISTCHECK_CONFIGURE_FLAGS],[$ac_configure_args])
 
-AC_CANONICAL_SYSTEM
-
 AM_INIT_AUTOMAKE([foreign subdir-objects -Wall -Wno-portability])
 #Backward compatible setting of "silent-rules"
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -39,8 +37,6 @@ AX_CHECK_ENABLE_DEBUG([info])
 AC_USE_SYSTEM_EXTENSIONS
 
 AC_PROG_CC
-AC_PROG_CC_C99
-AM_PROG_CC_C_O
 LT_INIT()
 
 PKG_INSTALLDIR()
