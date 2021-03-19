@@ -1,0 +1,21 @@
+name: Coverity Scan
+on: push
+jobs:
+  coverity-scan:
+    runs-on: ubuntu-latest
+    if: contains(github.ref, 'coverity_scan')
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Launch Container
+        env:
+          ENABLE_COVERITY: true
+          TPM2TSS_BRANCH: "3.0.x"
+          TPM2TOOLS_BRANCH: "4.0"
+          REPO_BRANCH: ${{ github.ref }}
+          REPO_SLUG: ${{ github.repository }}
+          DOCKER_IMAGE: ubuntu-18.04
+          CC: gcc
+          COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
+          COVERITY_SUBMISSION_EMAIL: william.c.roberts@intel.com
+        run: ./.ci/ci-runner.sh
