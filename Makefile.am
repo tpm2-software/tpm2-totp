@@ -71,7 +71,7 @@ include_HEADERS += include/tpm2-totp.h
 
 libtpm2_totp_la_SOURCES = src/libtpm2-totp.c
 libtpm2_totp_la_LIBADD = $(AM_LDADD)
-libtpm2_totp_la_LDFLAGS = $(AM_LDFLAGS) '(tpm2_totp)'
+libtpm2_totp_la_LDFLAGS = $(AM_LDFLAGS)
 
 pkgconfig_DATA = dist/tpm2-totp.pc
 
