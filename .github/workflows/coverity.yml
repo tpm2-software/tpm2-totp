@@ -3,6 +3,7 @@ on: push
 jobs:
   coverity-scan:
     runs-on: ubuntu-latest
+    environment: coverity
     if: contains(github.ref, 'coverity_scan')
     steps:
       - name: Check out repository
@@ -17,5 +18,5 @@ jobs:
           DOCKER_IMAGE: ubuntu-18.04
           CC: gcc
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
-          COVERITY_SUBMISSION_EMAIL: william.c.roberts@intel.com
+          COVERITY_SUBMISSION_EMAIL: diabonas@gmx.de
         run: ./.ci/ci-runner.sh
