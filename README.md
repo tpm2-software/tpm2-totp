@@ -1,6 +1,7 @@
 [![Linux Build Status](https://github.com/tpm2-software/tpm2-totp/workflows/Linux%20Build%20Status/badge.svg)](https://github.com/tpm2-software/tpm2-totp/actions)
 [![Code Coverage](https://codecov.io/gh/tpm2-software/tpm2-totp/branch/master/graph/badge.svg)](https://codecov.io/gh/tpm2-software/tpm2-totp)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/tpm2-software/tpm2-totp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/tpm2-software/tpm2-totp/context:cpp)
+[![Coverity Scan](https://scan.coverity.com/projects/22811/badge.svg)](https://scan.coverity.com/projects/tpm2-totp)
 
 # Overview
 This is a reimplementation of Matthew Garrett's
