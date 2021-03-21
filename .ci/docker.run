@@ -35,4 +35,8 @@ make -j$(nproc) distcheck
 cat config.log
 popd
 
+if [ "x$ENABLE_COVERAGE" = "xtrue" ]; then
+    bash <(curl -s https://codecov.io/bash)
+fi
+
 popd
