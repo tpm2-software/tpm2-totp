@@ -153,7 +153,7 @@ AC_ARG_WITH([systemdsystemunitdir],
                            [with_systemdsystemunitdir="$libdir/systemd/system"])])
 AC_SUBST([systemdsystemunitdir], [$with_systemdsystemunitdir])
 
-AC_CONFIG_FILES([dist/initcpio/install/sd-tpm2-totp dist/tpm2-totp.service])
+AC_CONFIG_FILES([dist/initcpio/install/sd-tpm2-totp dist/tpm2-totp.service dist/tpm2-totp.timer])
 
 AC_ARG_ENABLE([plymouth],
               AS_HELP_STRING([--disable-plymouth], [Disable plymouth support]))

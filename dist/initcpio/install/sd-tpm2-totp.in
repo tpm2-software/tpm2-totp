@@ -12,11 +12,10 @@ build() {
     fi
 
     add_systemd_unit tpm2-totp.service
+    add_systemd_unit tpm2-totp.timer
     add_file @UDEVDIR@/rules.d/*tpm-udev.rules
     add_binary tpm2-totp
     add_binary @TSS2_TCTI_DEVICE_LIBDIR@/libtss2-tcti-device.so.0
-    add_binary @HELPERSDIR@/show-tpm2-totp /usr/bin/show-tpm2-totp
-    add_binary date
 }
 
 help() {

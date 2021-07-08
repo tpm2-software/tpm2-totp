@@ -198,11 +198,11 @@ helpers_SCRIPTS = dist/show-tpm2-totp
 initcpio_install_DATA = dist/initcpio/install/tpm2-totp dist/initcpio/install/sd-tpm2-totp
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
 
-systemdsystemunit_DATA = dist/tpm2-totp.service
+systemdsystemunit_DATA = dist/tpm2-totp.service dist/tpm2-totp.timer
 install-data-hook:
 	mkdir -p $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants && \
 	cd $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants && \
-	$(LN_S) ../tpm2-totp.service
+	$(LN_S) ../tpm2-totp.timer
 if HAVE_PLYMOUTH
 initcpio_install_DATA += dist/initcpio/install/plymouth-tpm2-totp dist/initcpio/install/sd-plymouth-tpm2-totp
 initcpio_hooks_DATA += dist/initcpio/hooks/plymouth-tpm2-totp
