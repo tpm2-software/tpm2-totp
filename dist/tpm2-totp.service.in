@@ -1,0 +1,15 @@
+[Unit]
+Description=Display a TOTP during boot
+Requires=systemd-vconsole-setup.service dev-tpm0.device
+After=systemd-vconsole-setup.service dev-tpm0.device
+Before=systemd-ask-password-console.service
+Conflicts=multi-user.target
+DefaultDependencies=no
+
+[Service]
+Type=exec
+ExecStart=@HELPERSDIR@/show-tpm2-totp
+StandardOutput=tty
+
+[Install]
+WantedBy=sysinit.target
