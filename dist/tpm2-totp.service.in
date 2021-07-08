@@ -7,6 +7,7 @@ Conflicts=multi-user.target
 DefaultDependencies=no
 
 [Service]
+Environment="TPM2TOTP_TCTI=device:/dev/tpm0"
 Type=exec
 ExecStart=@HELPERSDIR@/show-tpm2-totp
 StandardOutput=tty
