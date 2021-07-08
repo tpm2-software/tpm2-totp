@@ -8,7 +8,7 @@ DefaultDependencies=no
 
 [Timer]
 OnActiveSec=0
-OnUnitActiveSec=30
+OnCalendar=*-*-* *:*:00,30
 AccuracySec=1
 Unit=tpm2-totp.service
 
