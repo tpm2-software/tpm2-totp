@@ -7,7 +7,6 @@ Conflicts=multi-user.target
 DefaultDependencies=no
 
 [Timer]
-OnActiveSec=0
 OnCalendar=*-*-* *:*:00,30
 AccuracySec=1
 Unit=tpm2-totp.service
