@@ -199,7 +199,7 @@ initcpio_install_DATA = dist/initcpio/install/tpm2-totp dist/initcpio/install/sd
 initcpio_hooks_DATA = dist/initcpio/hooks/tpm2-totp
 
 systemdsystemunit_DATA = dist/tpm2-totp.service dist/tpm2-totp.timer
-install-data-hook:
+install-systemd-service-hook:
 	mkdir -p $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants && \
 	cd $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants && \
 	$(LN_S) ../tpm2-totp.service && \
@@ -209,9 +209,15 @@ initcpio_install_DATA += dist/initcpio/install/plymouth-tpm2-totp dist/initcpio/
 initcpio_hooks_DATA += dist/initcpio/hooks/plymouth-tpm2-totp
 
 systemdsystemunit_DATA += dist/plymouth-tpm2-totp.service
-install-data-hook:
+install-plymouth-service-hook:
+	mkdir -p $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants && \
 	cd $(DESTDIR)$(systemdsystemunitdir)/sysinit.target.wants && \
 	$(LN_S) ../plymouth-tpm2-totp.service
+else
+install-plymouth-service-hook:
 endif # HAVE_PLYMOUTH
+
+install-data-hook: install-systemd-service-hook install-plymouth-service-hook
+
 endif # HAVE_MKINITCPIO
 EXTRA_DIST += dist/initcpio/hooks/tpm2-totp dist/initcpio/hooks/plymouth-tpm2-totp
