@@ -12,7 +12,8 @@ AM_CFLAGS       = $(INCLUDE_DIRS) $(EXTRA_CFLAGS) $(TSS2_ESYS_CFLAGS) \
 AM_LDFLAGS      = $(EXTRA_LDFLAGS) $(CODE_COVERAGE_LIBS)
 AM_LDADD        = $(TSS2_ESYS_LIBS) $(TSS2_MU_LIBS)
 
-AM_DISTCHECK_CONFIGURE_FLAGS = --with-dracutmodulesdir='$$(libdir)/dracut/modules.d'
+AM_DISTCHECK_CONFIGURE_FLAGS = --with-dracutmodulesdir='$$(libdir)/dracut/modules.d' \
+                               --with-systemdsystemunitdir='$$(libdir)/systemd/system'
 
 # Initialize empty variables to be extended throughout
 bin_PROGRAMS =
