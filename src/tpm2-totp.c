@@ -32,7 +32,7 @@
 #define TPM2TOTP_ENV_TCTI "TPM2TOTP_TCTI"
 
 char *help =
-    "Usage: [options] {generate|calculate|reseal|recover|clean}\n"
+    "Usage: [options] {init|calculate|reseal|recover|clean}\n"
     "Options:\n"
     "    -h, --help      print help\n"
     "    -b, --banks     Selected PCR banks (default: SHA1,SHA256)\n"
@@ -61,7 +61,7 @@ static const struct option long_options[] = {
 };
 
 static struct opt {
-    enum { CMD_NONE, CMD_GENERATE, CMD_CALCULATE, CMD_RESEAL, CMD_RECOVER, CMD_CLEAN } cmd;
+    enum { CMD_NONE, CMD_INIT, CMD_CALCULATE, CMD_RESEAL, CMD_RECOVER, CMD_CLEAN } cmd;
     int banks;
     int nvindex;
     char *password;
@@ -86,7 +86,7 @@ decode_totp_rc(int rc)
             return "A TOTP secret is already stored, use 'calculate' to calculate the TOTP or 'clean' to delete it.";
             break;
         case (TPM2_RC_HANDLE | TPM2_RC_1):
-            return "No TOTP secret is currently stored, use 'generate' to generate one.";
+            return "No TOTP secret is currently stored, use 'init' to generate and store one.";
             break;
         case (TPM2_RC_POLICY_FAIL | TPM2_RC_9):
             return "The system state has changed, no TOTP could be calculated.";
@@ -235,12 +235,12 @@ parse_opts(int argc, char **argv)
 
     /* parse the non-option arguments */
     if (optind >= argc) {
-        ERR("Missing command: generate, calculate, reseal, recover, clean.\n\n");
+        ERR("Missing command: init, calculate, reseal, recover, clean.\n\n");
         ERR("%s", help);
         return -1;
     }
-    if (!strcmp(argv[optind], "generate")) {
-        opt.cmd = CMD_GENERATE;
+    if (!strcmp(argv[optind], "init")) {
+        opt.cmd = CMD_INIT;
     } else if (!strcmp(argv[optind], "calculate")) {
         opt.cmd = CMD_CALCULATE;
     } else if (!strcmp(argv[optind], "reseal")) {
@@ -250,7 +250,7 @@ parse_opts(int argc, char **argv)
     } else if (!strcmp(argv[optind], "clean")) {
         opt.cmd = CMD_CLEAN;
     } else {
-        ERR("Unknown command: generate, calculate, reseal, recover, clean.\n\n");
+        ERR("Unknown command: init, calculate, reseal, recover, clean.\n\n");
         ERR("%s", help);
         return -1;
     }
@@ -397,7 +397,7 @@ main(int argc, char **argv)
     chkrc(rc, goto err);
 
     switch(opt.cmd) {
-    case CMD_GENERATE:
+    case CMD_INIT:
 
         rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password, tcti_context,
                                   &secret, &secret_size,
