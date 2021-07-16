@@ -51,7 +51,7 @@ if [ -z "$plymouthd_pid" ]; then
     exit 99
 fi
 
-tpm2-totp --banks SHA256 --pcrs 0 --nvindex 0x018094AF --password abc generate
+tpm2-totp --banks SHA256 --pcrs 0 --nvindex 0x018094AF --password abc init
 
 tpm2_pcrextend 0:sha256=0000000000000000000000000000000000000000000000000000000000000000
 exit_status=0

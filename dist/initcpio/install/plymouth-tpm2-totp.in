@@ -27,7 +27,7 @@ to a Trusted Platform Module (TPM) to ensure that the boot process has not been
 tampered with. To set this up, a secret needs to be generated first and sealed
 to the TPM using
 
-tpm2-totp generate
+tpm2-totp init
 
 This stores the secret in the TPM and displays it to the user so that it can
 be recorded on a different device (e.g. a TOTP app). When the hook is run, the

@@ -3,7 +3,7 @@
 % DECEMBER 2018
 
 # NAME
-**tpm2-totp**(1) -- generate or calculate TPM based TOTPs
+**tpm2-totp**(1) -- initialize or calculate TPM based TOTPs
 
 # SYNOPSIS
 
@@ -22,8 +22,8 @@ options.
 
 ## COMMANDS
 
-  * `generate`:
-    Generate a new TOTP secret.
+  * `init`:
+    Generate and store a new TOTP secret.
     Possible options: `-b`, `-l`, `-N`, `-p`, `-P`, `-T`
 
   * `calculate`:
@@ -60,7 +60,7 @@ options.
     Selected PCR registers (default: 0,2,4,6)
 
   * `-P <password>`, `--password <password>`:
-    Password for the secret (default: none) (commands: generate, recover, reseal)
+    Password for the secret (default: none) (commands: init, recover, reseal)
 
   * `-t`, `--time`:
     Display the date/time of the TOTP calculation (commands: calculate)
@@ -82,15 +82,15 @@ options.
 # EXAMPLES
 
 ## Setup
-The TOTP secret can be generated with and without password. It is recommended to
+The TOTP secret can be initialized with and without password. It is recommended to
 set a password `-P`in order to enable recovery options. Also the PCRs and PCR
 banks can be selected `-p` and `-b`. Default values are PCRs `0,2,4` and
 banks `SHA1, SHA256`.
 ```
-tpm2-totp generate
-tpm2-totp -P verysecret generate
-tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 generate
-tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
+tpm2-totp init
+tpm2-totp -P verysecret init
+tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 init
+tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 init
 ```
 
 ## Boot
@@ -123,7 +123,7 @@ tpm2-totp clean
 All command additionally take the `-N` option to specify the NV index to be
 used. By default, 0x018094AF is used and recommended.
 ```
-tpm2-totp -N 0x01800001 -P verysecret generate
+tpm2-totp -N 0x01800001 -P verysecret init
 tpm2-totp -N 0x01800001 calculate
 tpm2-totp -N 0x01800001 -P verysecret recover
 tpm2-totp -N 0x01800001 -P verysecret reseal
@@ -135,7 +135,7 @@ to specify the TCTI to be used. If the TCTI is not specified explicitly, the
 default TCTI configured on the system is used. To e.g. use the TPM simulator
 bound to a given port, use
 ```
-tpm2-totp -T mssim:port=2321 generate
+tpm2-totp -T mssim:port=2321 init
 ```
 
 # RETURNS

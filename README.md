@@ -60,21 +60,21 @@ The project includes hooks for [dracut](https://dracut.wiki.kernel.org/),
 the TOTP during boot using [Plymouth](https://www.freedesktop.org/wiki/Software/Plymouth/).
 They are automatically installed if the corresponding tool is found on the
 system (also see [INSTALL](INSTALL.md) regarding necessary configuration
-options). To use them, install tpm2-totp and generate a TOTP secret, then enable
+options). To use them, install tpm2-totp and initialize a TOTP secret, then enable
 the tpm2-totp hook in your initramfs generator and rebuild the initramfs.
 
 # Usage
 
 ## Setup
-The TOTP secret can be generated with and without password. It is recommended to
+The TOTP secret can be initialized with and without password. It is recommended to
 set a password `-P`in order to enable recovery options. Also the PCRs and PCR
 banks can be selected `-p` and `-b`. Default values are PCRs `0,2,4` and
 banks `SHA1, SHA256`.
 ```
-tpm2-totp generate
-tpm2-totp -P verysecret generate
-tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 generate
-tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
+tpm2-totp init
+tpm2-totp -P verysecret init
+tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 init
+tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 init
 ```
 
 ## Boot
@@ -107,7 +107,7 @@ tpm2-totp clean
 All command additionally take the `-N` option to specify the NV index to be
 used. By default, 0x018094AF is used and recommended.
 ```
-tpm2-totp -N 0x01800001 -P verysecret generate
+tpm2-totp -N 0x01800001 -P verysecret init
 tpm2-totp -N 0x01800001 calculate
 tpm2-totp -N 0x01800001 -P verysecret recover
 tpm2-totp -N 0x01800001 -P verysecret reseal

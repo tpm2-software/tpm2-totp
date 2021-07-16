@@ -12,7 +12,7 @@ if [ "$exit_status" -ne 1 ]; then
 	exit 1
 fi
 
-tpm2-totp -P abc -p 0,1,2,3,4,5,6 -b SHA1,SHA256 generate
+tpm2-totp -P abc -p 0,1,2,3,4,5,6 -b SHA1,SHA256 init
 
 # Changing an unselected PCR bank should not affect the TOTP calculation
 tpm2_pcrextend 0:sha384=000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
