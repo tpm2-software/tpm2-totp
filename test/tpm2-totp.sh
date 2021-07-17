@@ -28,6 +28,9 @@ fi
 
 tpm2-totp -P abc recover
 
+# Test reading password from stdin
+echo -n 'abc' | tpm2-totp -P - recover
+
 tpm2-totp -P abc -p 0,1,2,3,4,5,6 -b SHA1,SHA256 reseal
 
 # Changing an unselected PCR bank should not affect the TOTP calculation
