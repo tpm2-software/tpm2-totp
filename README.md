@@ -67,13 +67,22 @@ the tpm2-totp hook in your initramfs generator and rebuild the initramfs.
 
 ## Setup
 The TOTP secret can be initialized with and without password. It is recommended to
-set a password `-P`in order to enable recovery options. Also the PCRs and PCR
-banks can be selected `-p` and `-b`. Default values are PCRs `0,2,4` and
-banks `SHA1, SHA256`.
+set a password `-P` in order to enable recovery options. Further, it is strongly
+recommended to provide the password via stdin, rather than directly as a
+command line option, to protect it from other processes, shell history, etc.
+Also the PCRs and PCR banks can be selected `-p` and `-b`. Default values are
+PCRs `0,2,4` and banks `SHA1, SHA256`.
 ```
 tpm2-totp init
+
+tpm2-totp -P - init
+verysecret<CTRL-D>
+# or (recommended)
+gpg --decrypt /path/to/password.gpg | tpm2-totp -P - init
+# or (discouraged)
 tpm2-totp -P verysecret init
-tpm2-totp -P verysecret -p 0,1,2,3,4,5,6 init
+
+tpm2-totp -P - -p 0,1,2,3,4,5,6 init
 tpm2-totp -p 0,1,2,3,4,5,6 -b SHA1,SHA256 init
 ```
 
@@ -89,12 +98,12 @@ tpm2-totp -t show
 ## Recovery
 In order to recover the QR code:
 ```
-tpm2-totp -P verysecret recover
+tpm2-totp -P - recover
 ```
 In order to reseal the secret:
 ```
-tpm2-totp -P verysecret reseal
-tpm2-totp -P verysecret -p 1,3,5,6 reseal
+tpm2-totp -P - reseal
+tpm2-totp -P - -p 1,3,5,6 reseal
 ```
 
 ## Deletion
@@ -107,10 +116,10 @@ tpm2-totp clean
 All command additionally take the `-N` option to specify the NV index to be
 used. By default, 0x018094AF is used and recommended.
 ```
-tpm2-totp -N 0x01800001 -P verysecret init
+tpm2-totp -N 0x01800001 -P - init
 tpm2-totp -N 0x01800001 show
-tpm2-totp -N 0x01800001 -P verysecret recover
-tpm2-totp -N 0x01800001 -P verysecret reseal
+tpm2-totp -N 0x01800001 -P - recover
+tpm2-totp -N 0x01800001 -P - reseal
 ```
 
 # Limitations
