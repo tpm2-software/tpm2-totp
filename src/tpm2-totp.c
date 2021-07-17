@@ -206,7 +206,35 @@ parse_opts(int argc, char **argv)
             }
             break;
         case 'P':
-            opt.password = optarg;
+            if (!strcmp(optarg, "-")) {
+                int c;
+                char *buf = NULL;
+                size_t buf_size = 0;
+                while ((c = getc(stdin)) != EOF) {
+                    char *buf_tmp = (char *)realloc(buf, buf_size + 2); /* + 2 for \0 termination */
+                    if (buf_tmp == NULL) {
+                        ERR("Error reading password from stdin. Out of memory after %lu bytes allocated.\n", buf_size);
+                        free(buf);
+                        return -1;
+                    }
+                    buf = buf_tmp;
+                    if (c == '\0') {
+                        ERR("Error reading password from stdin. Must not contain '\\0'.\n");
+                        free(buf);
+                        return -1;
+                    }
+                    buf[buf_size++] = c;
+                }
+                if (buf == NULL) {
+                    ERR("Error reading password from stdin. Empty file.\n");
+                    return -1;
+                } else {
+                    buf[buf_size] = '\0';
+                    opt.password = buf;
+                }
+            } else {
+                opt.password = optarg;
+            }
             break;
         case 'p':
             if (parse_pcrs(optarg, &opt.pcrs) != 0) {
