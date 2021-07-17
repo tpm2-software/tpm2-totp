@@ -82,8 +82,8 @@ During boot the TOTP value for the current time, together with the current time
 should be shown to the user, e.g. using plymouth from mkinitrd or from dracut.
 The command to be executed is:
 ```
-tpm2-totp calculate
-tpm2-totp -t calculate
+tpm2-totp show
+tpm2-totp -t show
 ```
 
 ## Recovery
@@ -108,7 +108,7 @@ All command additionally take the `-N` option to specify the NV index to be
 used. By default, 0x018094AF is used and recommended.
 ```
 tpm2-totp -N 0x01800001 -P verysecret init
-tpm2-totp -N 0x01800001 calculate
+tpm2-totp -N 0x01800001 show
 tpm2-totp -N 0x01800001 -P verysecret recover
 tpm2-totp -N 0x01800001 -P verysecret reseal
 ```
@@ -117,7 +117,7 @@ tpm2-totp -N 0x01800001 -P verysecret reseal
 Whilst tpm2-totp provided the added security (in comparison to tpm-totp) that
 the key will not leave the TPM during the calculate operation, the time source
 is still not trustworthy and thus an attacker might in some situations be able
-to generate a set of TOTP values for the future. Depending on the size of the
+to calculate a set of TOTP values for the future. Depending on the size of the
 possible attack window this can be very large though.
 
 It is not yet possible to specify specific PCR values independent of the

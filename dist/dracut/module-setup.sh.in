@@ -2,7 +2,7 @@
 
 check() {
     if [ -n "$hostonly" ]; then
-        if tpm2-totp calculate >/dev/null 2>&1; then
+        if tpm2-totp show >/dev/null 2>&1; then
             return 0
         else
             dinfo "dracut module 'tpm2-totp' will not be installed because no TOTP is configured; run 'tpm2-totp init'!"

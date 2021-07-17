@@ -1,6 +1,6 @@
 #!/bin/sh
 while true; do
-    totp="$(tpm2-totp --time "$@" calculate)" || break
+    totp="$(tpm2-totp --time "$@" show)" || break
     printf '\n%s\n' "$totp"
     sleep $(( 30 - $(date +%s) % 30 ))
 done
