@@ -3,7 +3,7 @@
 % DECEMBER 2018
 
 # NAME
-**tpm2-totp**(1) -- initialize or calculate TPM based TOTPs
+**tpm2-totp**(1) -- initialize or calculate and show TPM based TOTPs
 
 # SYNOPSIS
 
@@ -11,7 +11,7 @@
 
 # DESCRIPTION
 
-**tpm2-totp** creates a key inside a TPM 2.0 that can be used to generate
+**tpm2-totp** creates a key inside a TPM 2.0 that can be used to calculate
 time-based onetime passwords (TOTPs) to demonstrate to the user that a platform
 was not altered during his/her abscense and thus still trustworthy.
 
@@ -26,8 +26,8 @@ options.
     Generate and store a new TOTP secret.
     Possible options: `-b`, `-l`, `-N`, `-p`, `-P`, `-T`
 
-  * `calculate`:
-    Calculate a TOTP value.
+  * `show`:
+    Calculate and show a TOTP value.
     Possible options: `-N`, `-t`, `-T`
 
   * `reseal`:
@@ -63,7 +63,7 @@ options.
     Password for the secret (default: none) (commands: init, recover, reseal)
 
   * `-t`, `--time`:
-    Display the date/time of the TOTP calculation (commands: calculate)
+    Display the date/time of the TOTP calculation (commands: show)
 
   * `-T <tcti-name>[:<tcti-config>]`, `--tcti <tcti-name>[:<tcti-config>]`:
     Select the TCTI to use. *tcti-name* is the name of the TCTI library.
@@ -98,8 +98,8 @@ During boot the TOTP value for the current time, together with the current time
 should be shown to the user, e.g. using plymouth from mkinitrd or from dracut.
 The command to be executed is:
 ```
-tpm2-totp calculate
-tpm2-totp -t calculate
+tpm2-totp show
+tpm2-totp -t show
 ```
 
 ## Recovery
@@ -124,7 +124,7 @@ All command additionally take the `-N` option to specify the NV index to be
 used. By default, 0x018094AF is used and recommended.
 ```
 tpm2-totp -N 0x01800001 -P verysecret init
-tpm2-totp -N 0x01800001 calculate
+tpm2-totp -N 0x01800001 show
 tpm2-totp -N 0x01800001 -P verysecret recover
 tpm2-totp -N 0x01800001 -P verysecret reseal
 ```

@@ -9,7 +9,7 @@ DefaultDependencies=no
 [Service]
 Environment="TPM2TOTP_TCTI=device:/dev/tpm0"
 Type=oneshot
-ExecStart=/bin/sh -c 'echo "TOTP: $(tpm2-totp --time calculate)"'
+ExecStart=/bin/sh -c 'echo "TOTP: $(tpm2-totp --time show)"'
 StandardOutput=tty
 
 [Install]
