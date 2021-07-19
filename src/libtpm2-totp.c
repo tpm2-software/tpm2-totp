@@ -310,6 +310,61 @@ error:
     return (rc)? (int)rc : -1;
 }
 
+/** Unmarshal keyBlob.
+ *
+ * @param[in] keyBlob Key to unmarshal.
+ * @param[in] keyBlob_size Size of the key.
+ * @param[out] pcrs PCRs the key was sealed against (untrusted).
+ * @param[out] banks PCR banks the key was sealed against (untrusted).
+ * @param[out] keyPublicHmac Public TOTP blob.
+ * @param[out] keyPrivateHmac Private TOTP blob .
+ * @param[out] keyPublicSeal Public resealing blob.
+ * @param[out] keyPrivateSeal Private resealing blob.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
+ * @retval -20 when no password-protected recovery copy of the secret has been stored.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
+ */
+int
+tpm2totp_unmarshal_blob(const uint8_t *keyBlob, size_t keyBlob_size,
+                        uint32_t *pcrs, uint32_t *banks,
+                        TPM2B_PUBLIC *keyPublicHmac, TPM2B_PRIVATE *keyPrivateHmac,
+                        TPM2B_PUBLIC *keyPublicSeal, TPM2B_PRIVATE *keyPrivateSeal)
+{
+    TSS2_RC rc;
+    size_t offset = 0;
+
+    rc = Tss2_MU_UINT32_Unmarshal(keyBlob, keyBlob_size, &offset, pcrs);
+    chkrc(rc, goto error);
+    rc = Tss2_MU_UINT32_Unmarshal(keyBlob, keyBlob_size, &offset, banks);
+    chkrc(rc, goto error);
+
+    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &offset, keyPublicHmac);
+    chkrc(rc, goto error);
+    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &offset, keyPrivateHmac);
+    chkrc(rc, goto error);
+
+    if (offset == keyBlob_size) {
+        dbg("No unseal blob included.");
+        return -20;
+    }
+
+    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &offset, keyPublicSeal);
+    chkrc(rc, goto error);
+    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &offset, keyPrivateSeal);
+    chkrc(rc, goto error);
+
+    if (offset != keyBlob_size) {
+        dbg("bad blob size");
+        return -1;
+    }
+
+    return 0;
+
+error:
+    return (rc)? (int)rc : -1;
+}
+
 /** Reseal a key to new PCR values.
  *
  * @param[in] keyBlob Original key.
@@ -343,7 +398,6 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     ESYS_CONTEXT *ctx = NULL;
     ESYS_TR primary = ESYS_TR_NONE, key, session;
     TSS2_RC rc;
-    size_t off = 0;
     TPM2B_SENSITIVE_DATA *secret2b = NULL;
     TPM2B_AUTH auth;
     TPM2B_DIGEST *policyDigest;
@@ -389,32 +443,14 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     memcpy(&auth.buffer[0], password, auth.size);
 
     /* We skip over the pcrs and banks from NV because they are not trustworthy */
-    rc = Tss2_MU_UINT32_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_UINT32_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-    chkrc(rc, goto error);
-
-    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-    chkrc(rc, goto error);
-
-    if (off == keyBlob_size) {
-        dbg("No unseal blob included.");
-        return -20;
+    rc = tpm2totp_unmarshal_blob(keyBlob, keyBlob_size,
+                                  NULL, NULL,
+                                  NULL, NULL,
+                                  &keyPublicSeal, &keyPrivateSeal);
+    if (rc != 0) {
+        chkrc(rc, goto error);
     }
 
-    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off,
-                                        &keyPublicSeal);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off,
-                                         &keyPrivateSeal);
-    chkrc(rc, goto error);
-
-    if (off != keyBlob_size) {
-        dbg("bad blob size");
-        return -1;
-    }
 
     rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, goto error);
@@ -501,7 +537,7 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     }
 
     *newBlob = malloc(*newBlob_size);
-    off = 0;
+    size_t off = 0;
 
     rc = Tss2_MU_UINT32_Marshal(pcrs, *newBlob, *newBlob_size, &off);
     chkrc(rc, goto error_marshall);
@@ -741,7 +777,6 @@ tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
     TSS2_RC rc;
     TPM2B_PUBLIC keyPublic = { .size=0 };
     TPM2B_PRIVATE keyPrivate = { .size=0 };
-    size_t off = 0;
     TPM2B_DIGEST *output;
     uint32_t pcrs;
     uint32_t banks;
@@ -758,26 +793,12 @@ tpm2totp_calculate(const uint8_t *keyBlob, size_t keyBlob_size,
                         .mode = {.aes = TPM2_ALG_CFB}
     };
 
-    rc = Tss2_MU_UINT32_Unmarshal(keyBlob, keyBlob_size, &off, &pcrs);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_UINT32_Unmarshal(keyBlob, keyBlob_size, &off, &banks);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, &keyPublic);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off,
-                                         &keyPrivate);
-    chkrc(rc, goto error);
-
-    if (off != keyBlob_size) {
-        rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
+    rc = tpm2totp_unmarshal_blob(keyBlob, keyBlob_size,
+                                  &pcrs, &banks,
+                                  &keyPublic, &keyPrivate,
+                                  NULL, NULL);
+    if (rc != 0) {
         chkrc(rc, goto error);
-        rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-        chkrc(rc, goto error);
-    }
-
-    if (off != keyBlob_size) {
-        dbg("bad blob size");
-        return -1;
     }
 
     if ((banks & TPM2TOTP_BANK_SHA1)) {
@@ -903,32 +924,18 @@ tpm2totp_getSecret(const uint8_t *keyBlob, size_t keyBlob_size,
     TSS2_RC rc;
     TPM2B_PUBLIC keyPublic = { .size=0 };
     TPM2B_PRIVATE keyPrivate = { .size=0 };
-    size_t off = 4 + 4; /* Skipping over pcrs and banks */
     TPM2B_SENSITIVE_DATA *secret2b;
     TPM2B_AUTH auth;
 
     auth.size = strlen(password);
     memcpy(&auth.buffer[0], password, auth.size);
 
-    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off, NULL);
-    chkrc(rc, goto error);
-
-    if (off == keyBlob_size) {
-        dbg("No unseal blob included.");
-        return -20;
-    }
-
-    rc = Tss2_MU_TPM2B_PUBLIC_Unmarshal(keyBlob, keyBlob_size, &off, &keyPublic);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Unmarshal(keyBlob, keyBlob_size, &off,
-                                         &keyPrivate);
-    chkrc(rc, goto error);
-
-    if (off != keyBlob_size) {
-        dbg("bad blob size");
-        return -1;
+    rc = tpm2totp_unmarshal_blob(keyBlob, keyBlob_size,
+                                  NULL, NULL,
+                                  NULL, NULL,
+                                  &keyPublic, &keyPrivate);
+    if (rc != 0) {
+        chkrc(rc, goto error);
     }
 
     rc = Esys_Initialize(&ctx, tcti_context, NULL);
