@@ -22,6 +22,12 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
                      uint8_t **keyBlob, size_t *keyBlob_size);
 
 int
+tpm2totp_marshal_blob(uint8_t **keyBlob, size_t *keyBlob_size,
+                      uint32_t pcrs, uint32_t banks,
+                      TPM2B_PUBLIC *keyPublicHmac, TPM2B_PRIVATE *keyPrivateHmac,
+                      TPM2B_PUBLIC *keyPublicSeal, TPM2B_PRIVATE *keyPrivateSeal);
+
+int
 tpm2totp_unmarshal_blob(const uint8_t *keyBlob, size_t keyBlob_size,
                         uint32_t *pcrs, uint32_t *banks,
                         TPM2B_PUBLIC *keyPublicHmac, TPM2B_PRIVATE *keyPrivateHmac,

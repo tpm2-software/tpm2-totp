@@ -127,8 +127,6 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
     ESYS_TR primary, session;
     TSS2_RC rc;
 
-    size_t off = 0;
-
     TPMT_SYM_DEF sym = {.algorithm = TPM2_ALG_AES,
                         .keyBits = {.aes = 128},
                         .mode = {.aes = TPM2_ALG_CFB}
@@ -258,45 +256,15 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
     Esys_FlushContext(ctx, primary);
     Esys_Finalize(&ctx);
 
-    *keyBlob_size = 4 + 4;
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac, NULL, -1, keyBlob_size);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac, NULL, -1, keyBlob_size);
-    chkrc(rc, goto error);
-    if (password && strlen(password) > 0) {
-        rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicSeal, NULL, -1, keyBlob_size);
+    rc = tpm2totp_marshal_blob(keyBlob, keyBlob_size,
+                               pcrs, banks,
+                               keyPublicHmac, keyPrivateHmac,
+                               keyPublicSeal, keyPrivateSeal);
+    if (rc != 0) {
         chkrc(rc, goto error);
-        rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateSeal, NULL, -1, keyBlob_size);
-        chkrc(rc, goto error);
-    }
-
-    *keyBlob = malloc(*keyBlob_size);
-
-    rc = Tss2_MU_UINT32_Marshal(pcrs, *keyBlob, *keyBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_UINT32_Marshal(banks, *keyBlob, *keyBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac,
-                                      *keyBlob, *keyBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac,
-                                       *keyBlob, *keyBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    if (password && strlen(password) > 0) {
-        rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicSeal,
-                                          *keyBlob, *keyBlob_size, &off);
-        chkrc(rc, goto error_marshall);
-        rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateSeal,
-                                           *keyBlob, *keyBlob_size, &off);
-        chkrc(rc, goto error_marshall);
     }
 
     return 0;
-
-error_marshall:
-    free(*keyBlob);
-    *keyBlob = NULL;
-    return (rc)? (int)rc : -1;
 
 error:
     free(keyPublicHmac);
@@ -307,6 +275,79 @@ error:
     free(*secret);
     *secret = NULL;
     *secret_size = 0;
+    return (rc)? (int)rc : -1;
+}
+
+/** Marshal keyBlob.
+ *
+ * @param[out] keyBlob Generated key.
+ * @param[out] keyBlob_size Size of the generated key.
+ * @param[in] pcrs PCRs the key should be sealed against.
+ * @param[in] banks PCR banks the key should be sealed against.
+ * @param[in] keyPublicHmac Public TOTP blob.
+ * @param[in] keyPrivateHmac Private TOTP blob .
+ * @param[in] keyPublicSeal Public resealing blob. Ignored if NULL.
+ * @param[in] keyPrivateSeal Private resealing blob. Ignored if NULL.
+ * @retval 0 on success.
+ * @retval -1 on undefined/general failure.
+ * @retval TSS2_RC response code for failures relayed from the TSS library.
+ */
+int
+tpm2totp_marshal_blob(uint8_t **keyBlob, size_t *keyBlob_size,
+                      uint32_t pcrs, uint32_t banks,
+                      TPM2B_PUBLIC *keyPublicHmac, TPM2B_PRIVATE *keyPrivateHmac,
+                      TPM2B_PUBLIC *keyPublicSeal, TPM2B_PRIVATE *keyPrivateSeal)
+{
+    TSS2_RC rc;
+
+    /* determine blob size */
+    *keyBlob_size = 4 + 4; /* fixed pcrs and banks size */
+    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac, NULL, -1, keyBlob_size);
+    chkrc(rc, goto error);
+    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac, NULL, -1, keyBlob_size);
+    chkrc(rc, goto error);
+    if (keyPublicSeal != NULL && keyPrivateSeal != NULL) {
+        rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicSeal, NULL, -1, keyBlob_size);
+        chkrc(rc, goto error);
+        rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateSeal, NULL, -1, keyBlob_size);
+        chkrc(rc, goto error);
+    }
+
+    /* marshal blob */
+    *keyBlob = malloc(*keyBlob_size);
+    if (*keyBlob == NULL) {
+        dbg("Could not allocate memory.");
+        *keyBlob_size = 0;
+        return -1;
+    }
+
+    size_t offset = 0;
+
+    rc = Tss2_MU_UINT32_Marshal(pcrs, *keyBlob, *keyBlob_size, &offset);
+    chkrc(rc, goto error_marshall);
+    rc = Tss2_MU_UINT32_Marshal(banks, *keyBlob, *keyBlob_size, &offset);
+    chkrc(rc, goto error_marshall);
+    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac, *keyBlob, *keyBlob_size, &offset);
+    chkrc(rc, goto error_marshall);
+    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac, *keyBlob, *keyBlob_size, &offset);
+    chkrc(rc, goto error_marshall);
+    if (keyPublicSeal != NULL && keyPrivateSeal != NULL) {
+        rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicSeal, *keyBlob, *keyBlob_size, &offset);
+        chkrc(rc, goto error_marshall);
+        rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateSeal, *keyBlob, *keyBlob_size, &offset);
+        chkrc(rc, goto error_marshall);
+    }
+
+    return 0;
+
+error_marshall:
+    free(*keyBlob);
+    *keyBlob = NULL;
+    *keyBlob_size = 0;
+
+    return (rc)? (int)rc : -1;
+
+error:
     return (rc)? (int)rc : -1;
 }
 
@@ -524,51 +565,18 @@ tpm2totp_reseal(const uint8_t *keyBlob, size_t keyBlob_size,
     Esys_FlushContext(ctx, primary);
     Esys_Finalize(&ctx);
 
-    *newBlob_size = 4 + 4;
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac, NULL, -1, newBlob_size);
-    chkrc(rc, goto error);
-    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac, NULL, -1, newBlob_size);
-    chkrc(rc, goto error);
-    if (password && strlen(password) > 0) {
-        rc = Tss2_MU_TPM2B_PUBLIC_Marshal(&keyPublicSeal, NULL, -1, newBlob_size);
-        chkrc(rc, goto error);
-        rc = Tss2_MU_TPM2B_PRIVATE_Marshal(&keyPrivateSeal, NULL, -1, newBlob_size);
+    rc = tpm2totp_marshal_blob(newBlob, newBlob_size,
+                               pcrs, banks,
+                               keyPublicHmac, keyPrivateHmac,
+                               &keyPublicSeal, &keyPrivateSeal);
+    if (rc != 0) {
         chkrc(rc, goto error);
     }
-
-    *newBlob = malloc(*newBlob_size);
-    size_t off = 0;
-
-    rc = Tss2_MU_UINT32_Marshal(pcrs, *newBlob, *newBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_UINT32_Marshal(banks, *newBlob, *newBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(keyPublicHmac,
-                                      *newBlob, *newBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(keyPrivateHmac,
-                                       *newBlob, *newBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PUBLIC_Marshal(&keyPublicSeal,
-                                      *newBlob, *newBlob_size, &off);
-    chkrc(rc, goto error_marshall);
-    rc = Tss2_MU_TPM2B_PRIVATE_Marshal(&keyPrivateSeal,
-                                       *newBlob, *newBlob_size, &off);
-    chkrc(rc, goto error_marshall);
 
     free(keyPublicHmac);
     free(keyPrivateHmac);
 
     return 0;
-
-error_marshall:
-    free(keyPublicHmac);
-    free(keyPrivateHmac);
-    free(*newBlob);
-    *newBlob = 0;
-    *newBlob_size = 0;
-
-    return (rc)? (int)rc : -1;
 
 error:
     free(keyPublicHmac);
