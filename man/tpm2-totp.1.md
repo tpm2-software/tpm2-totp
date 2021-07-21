@@ -17,8 +17,8 @@ was not altered during his/her abscense and thus still trustworthy.
 
 # ARGUMENTS
 
-The `tpm2-totp` command expects one of five command and provides a set of
-options.
+The `tpm2-totp` command expects one of the following commands and provides a
+set of options.
 
 ## COMMANDS
 
@@ -29,6 +29,10 @@ options.
   * `show`:
     Calculate and show a TOTP value.
     Possible options: `-N`, `-t`, `-T`
+
+  * `status`:
+    Display enrollment status, PCRs, banks, etc., formatted as YAML.
+    Possible options: `-N`
 
   * `reseal`:
     Reseal TOTP secret to new PCRs, banks or values.
@@ -124,6 +128,14 @@ tpm2-totp -P - reseal
 tpm2-totp -P - -p 1,3,5,6 reseal
 ```
 
+## Status
+Check enrollment status:
+```
+tpm2-totp status
+```
+Tip: try piping the output to e.g. 'bat -l yaml -pp' for nice syntax
+highlighting or to 'yq' for YAML processing.
+
 ## Deletion
 In order to delete the created NV index:
 ```
@@ -138,6 +150,7 @@ tpm2-totp -N 0x01800001 -P - init
 tpm2-totp -N 0x01800001 show
 tpm2-totp -N 0x01800001 -P - recover
 tpm2-totp -N 0x01800001 -P - reseal
+tpm2-totp -N 0x01800001 status
 ```
 
 ## TCTI configuration
