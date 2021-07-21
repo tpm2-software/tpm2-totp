@@ -76,9 +76,11 @@ PCRs `0,2,4` and banks `SHA1, SHA256`.
 tpm2-totp init
 
 tpm2-totp -P - init
-verysecret<CTRL-D>
+> verysecret<CTRL-D>
+
 # or (recommended)
 gpg --decrypt /path/to/password.gpg | tpm2-totp -P - init
+
 # or (discouraged)
 tpm2-totp -P verysecret init
 
