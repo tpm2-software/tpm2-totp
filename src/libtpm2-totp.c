@@ -17,14 +17,6 @@
 #include <tss2/tss2_mu.h>
 #include <tss2/tss2_esys.h>
 
-/* RFC 6238 TOTP defines */
-#define TIMESTEPSIZE 30
-#define SECRETLEN 20
-
-#define DEFAULT_PCRS (0b000000000000000000010101)
-#define DEFAULT_BANKS (0b11)
-#define DEFAULT_NV 0x018094AF
-
 const TPM2B_DIGEST ownerauth = { .size = 0 };
 
 #ifdef NDEBUG
