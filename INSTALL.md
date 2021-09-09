@@ -38,7 +38,7 @@ sudo apt -y install \
   iproute2 \
   plymouth \
   libplymouth-dev
-git clone --depth=1 http://www.github.com/tpm2-software/tpm2-tss
+git clone --depth=1 https://github.com/tpm2-software/tpm2-totp
 cd tpm2-tss
 ./bootstrap
 ./configure
