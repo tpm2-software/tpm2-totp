@@ -20,7 +20,7 @@ jobs:
           TPM2TSS_BRANCH: "${{ matrix.TPM2TSS_BRANCH }}"
           TPM2TOOLS_BRANCH: "${{ matrix.TPM2TOOLS_BRANCH }}"
           CC: "${{ matrix.CC }}"
-        run: ./.ci/ci-runner.sh
+        run: ./.ci/ci.sh
       - name: failure
         if: ${{ failure() }}
         run: cat build/test-suite.log || true
@@ -37,7 +37,7 @@ jobs:
           TPM2TOOLS_BRANCH: "4.0"
           CC: gcc
           ENABLE_COVERAGE: true
-        run: ./.ci/ci-runner.sh
+        run: ./.ci/ci.sh
       - name: failure
         if: ${{ failure() }}
         run: cat build/test-suite.log || true
@@ -59,7 +59,7 @@ jobs:
           CC: gcc
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
           COVERITY_SUBMISSION_EMAIL: diabonas@gmx.de
-        run: ./.ci/ci-runner.sh
+        run: ./.ci/ci.sh
   whitespace-check:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' && !contains(github.ref, 'coverity_scan')
