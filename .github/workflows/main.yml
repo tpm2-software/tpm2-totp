@@ -54,7 +54,7 @@ jobs:
           TPM2TSS_BRANCH: "3.0.x"
           TPM2TOOLS_BRANCH: "4.0"
           REPO_BRANCH: ${{ github.ref }}
-          REPO_SLUG: ${{ github.repository }}
+          REPO_NAME: ${{ github.repository }}
           DOCKER_IMAGE: ubuntu-18.04
           CC: gcc
           COVERITY_SCAN_TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
