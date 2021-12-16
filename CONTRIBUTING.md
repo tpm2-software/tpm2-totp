@@ -27,5 +27,11 @@ must add a 'Signed-off-by' line to their commits. This indicates the
 submitters acceptance of the DCO.
 
 ## Guideline for merging changes
-Changes must be merged with the "rebase" option on github to avoid merge
-commits. This provides for a clear linear history.
+
+Pull Requests MUST be assigned to an upcoming release tag. If a release milestone does
+not exist, the maintainer SHALL create it per the [RELEASE.md](RELEASE.md) instructions.
+When accepting and merging a change, the maintainer MUST edit the description field for
+the release milestone to add the CHANGELOG entry.
+
+Changes must be merged with the "rebase" option on github to avoid merge commits.
+This provides for a clear linear history.

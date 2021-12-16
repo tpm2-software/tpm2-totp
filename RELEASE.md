@@ -2,6 +2,11 @@
 This document describes the general process that maintainers must follow when
 making a release of the `tpm2-totp` library and cli-tool.
 
+# Milestones
+All releases should have a milestone used to track the release. If the release version is not known, as covered in [Version Numbers](#Version Numbers),
+then an "x" may be used for the unknown number, or the generic term "next" may be used. The description field of the milestone will be used to record
+the CHANGELOG for that release. See [CHANGELOG Update](#CHANGELOG Update) for details.
+
 # Version Numbers
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
@@ -27,6 +32,12 @@ to indicate progress using the abbreviation `rc` for 'release candidate'. This
 string will take the form of `_rcX`. We append an incremental digit `X` in case
 more than one release candidate is necessary to communicate progress as
 development moves forward.
+
+# CHANGELOG Update
+Before tagging the repository with the release version, the maintainer MUST
+update the CHANGELOG file with the contents from the description field from the
+corresponding release milestone and update any missing version string details in
+the CHANGELOG and milestone entry.
 
 # Git Tags
 When a release is made a tag is created in the git repo identifying the release
