@@ -125,7 +125,8 @@ EXTRA_DIST += \
     CONTRIBUTING.md \
     INSTALL.md \
     LICENSE \
-    README.md
+    README.md \
+    VERSION
 
 # Generate the AUTHORS file from git log
 AUTHORS:

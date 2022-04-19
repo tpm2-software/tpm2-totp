@@ -5,7 +5,7 @@
 AC_PREREQ([2.68])
 
 AC_INIT([tpm2-totp],
-        [0.4.0-dev],
+        [m4_esyscmd_s([cat ./VERSION])],
         [https://github.com/tpm2-software/tpm2-totp/issues],
         [],
         [https://github.com/tpm2-software/tpm2-totp])
