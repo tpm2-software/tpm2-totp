@@ -1,6 +1,7 @@
 [Unit]
 Description=Display a TOTP every 30s during boot
-Requires=systemd-vconsole-setup.service dev-tpm0.device
+Requires=dev-tpm0.device
+Wants=systemd-vconsole-setup.service
 After=systemd-vconsole-setup.service dev-tpm0.device
 Before=systemd-ask-password-console.service
 Conflicts=multi-user.target
