@@ -129,7 +129,7 @@ is still not trustworthy and thus an attacker might in some situations be able
 to calculate a set of TOTP values for the future. Depending on the size of the
 possible attack window this can be very large though.
 
-It is not yet possible to specify specific PCR values independent of the
+It is not yet possible to specific PCR values independent of the
 currently set PCR values. This would allow disabling the password-less calculate
 operation after booting the device. This makes most sense, once a TSS2 FAPI
 is available that will enable an interface to a canonical PCR event log.
