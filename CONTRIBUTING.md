@@ -2,7 +2,7 @@
 All non security bugs should be filed on the Issues tracker:
 https://github.com/tpm2-software/tpm2-totp/issues
 
-Security sensitive bugs should be emailed to a maintainers directly.
+Security sensitive bugs should follow the instructions in SECURITY.md.
 
 # Guideline for submitting changes:
 All changes to the source code must follow the coding standard used in the
