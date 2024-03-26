@@ -20,6 +20,8 @@
 #define VERB(...) if (opt.verbose) fprintf(stderr, __VA_ARGS__)
 #define ERR(...) fprintf(stderr, __VA_ARGS__)
 
+#define FIELD_WIDTH 16-1 /* -1 for trailing space */
+
 #define chkrc(rc, cmd) if (rc != TSS2_RC_SUCCESS) {\
     const char* error_text = decode_totp_rc(rc); \
     if (error_text) {\
@@ -32,7 +34,7 @@
 #define TPM2TOTP_ENV_TCTI "TPM2TOTP_TCTI"
 
 char *help =
-    "Usage: [options] {init|show|reseal|recover|clean}\n"
+    "Usage: [options] {init|show|status|reseal|recover|clean}\n"
     "Options:\n"
     "    -h, --help      print help\n"
     "    -b, --banks     Selected PCR banks (default: SHA1,SHA256)\n"
@@ -61,7 +63,7 @@ static const struct option long_options[] = {
 };
 
 static struct opt {
-    enum { CMD_NONE, CMD_INIT, CMD_SHOW, CMD_RESEAL, CMD_RECOVER, CMD_CLEAN } cmd;
+    enum { CMD_NONE, CMD_INIT, CMD_SHOW, CMD_STATUS, CMD_RESEAL, CMD_RECOVER, CMD_CLEAN } cmd;
     int banks;
     int nvindex;
     char *password;
@@ -100,6 +102,34 @@ decode_totp_rc(int rc)
         default:
             return NULL;
     }
+}
+
+void
+print_yaml_pcrs(uint32_t pcrs)
+{
+    printf("[");
+    uint8_t count_pcrs = 0;
+    for (uint8_t pcr_index = 0; pcr_index < NUM_PCRS; pcr_index++) {
+        if (pcrs & (0b1 << pcr_index)) {
+            if (count_pcrs++) printf(",");
+            printf("%u", pcr_index);
+        }
+    }
+    printf("]");
+}
+
+void
+print_yaml_banks(uint32_t banks)
+{
+    printf("[");
+    uint8_t count_banks = 0;
+    for (uint8_t bank_index = 0; bank_index < TPM2TOTP_NUM_BANKS; bank_index++) {
+        if (banks & TPM2TOTP_BANKS[bank_index].bank) {
+            if (count_banks++) printf(",");
+            printf("%s", TPM2TOTP_BANKS[bank_index].name);
+        }
+    }
+    printf("]");
 }
 
 int
@@ -263,7 +293,7 @@ parse_opts(int argc, char **argv)
 
     /* parse the non-option arguments */
     if (optind >= argc) {
-        ERR("Missing command: init, show, reseal, recover, clean.\n\n");
+        ERR("Missing command: init, show, status, reseal, recover, clean.\n\n");
         ERR("%s", help);
         return -1;
     }
@@ -271,6 +301,8 @@ parse_opts(int argc, char **argv)
         opt.cmd = CMD_INIT;
     } else if (!strcmp(argv[optind], "show")) {
         opt.cmd = CMD_SHOW;
+    } else if (!strcmp(argv[optind], "status")) {
+        opt.cmd = CMD_STATUS;
     } else if (!strcmp(argv[optind], "reseal")) {
         opt.cmd = CMD_RESEAL;
     } else if (!strcmp(argv[optind], "recover")) {
@@ -278,7 +310,7 @@ parse_opts(int argc, char **argv)
     } else if (!strcmp(argv[optind], "clean")) {
         opt.cmd = CMD_CLEAN;
     } else {
-        ERR("Unknown command: init, show, reseal, recover, clean.\n\n");
+        ERR("Unknown command: init, show, status, reseal, recover, clean.\n\n");
         ERR("%s", help);
         return -1;
     }
@@ -454,6 +486,70 @@ main(int argc, char **argv)
             chkrc(rc, goto err);
         }
         printf("%s%06" PRIu64, timestr, totp);
+        break;
+    case CMD_STATUS: ; /* semi-colon needed to fix 'a label can only be part of a statement and a declaration is not a statement' error (because next line declares a variable) */
+        /* NVRAM index */
+        const uint32_t nvindex = (opt.nvindex == 0 || opt.nvindex == DEFAULT_NV) ? DEFAULT_NV : opt.nvindex;
+        printf("%-*s 0x%08X\n", FIELD_WIDTH, "NVRAM index:", nvindex);
+        printf("%-*s # %s NVRAM index\n", FIELD_WIDTH, "", (nvindex == DEFAULT_NV) ? "default" : "custom");
+
+
+        /* enrollment state */
+        rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context, &keyBlob, &keyBlob_size);
+        uint8_t enrolled = 0;
+        if (rc == 0) {
+            enrolled = 1;
+        } else if (rc == (TPM2_RC_HANDLE | TPM2_RC_1)) {
+            enrolled = 0;
+        } else {
+            chkrc(rc, goto err)
+        };
+        printf("%-*s %s\n", FIELD_WIDTH, "enrolled:", enrolled ? "true" : "false");
+        if (!enrolled) goto print_defaults;
+
+
+        uint32_t pcrs;
+        uint32_t banks;
+        rc = tpm2totp_unmarshal_blob(keyBlob, keyBlob_size,
+                                     &pcrs, &banks,
+                                     NULL, NULL,
+                                     NULL, NULL);
+        free(keyBlob);
+
+
+        /* resealable */
+        uint8_t resealable = 0;
+        if (rc == 0) {
+            resealable = 1;
+        } else if (rc == -20) {
+            resealable = 0;
+        } else {
+            chkrc(rc, goto err);
+        }
+        printf("%-*s %s\n", FIELD_WIDTH, "resealable:", resealable ? "true" : "false");
+
+
+        /* data from NVRAM */
+        printf("NVRAM data:\n");
+        printf("  # INFO: PCRs and PCR banks stored in NVRAM are not integrity\n"
+               "  #       protected and susceptible to undetected modification.\n"
+               "  #       Do not rely on their authenticity (e.g. for resealing).\n");
+
+        printf("%-*s ", FIELD_WIDTH, "  PCRs:"); print_yaml_pcrs(pcrs); printf("\n");
+        printf("%-*s # %s PCRs\n", FIELD_WIDTH, "", (pcrs == DEFAULT_PCRS) ? "default" : "custom");
+
+        printf("%-*s ", FIELD_WIDTH, "  PCR banks:"); print_yaml_banks(banks); printf("\n");
+        printf("%-*s # %s PCR banks\n", FIELD_WIDTH, "", (banks == DEFAULT_BANKS) ? "default" : "custom");
+
+
+print_defaults:
+        /* defaults */
+        printf("---\n");
+        printf("defaults:\n");
+        printf("%-*s 0x%08X\n", FIELD_WIDTH, "  NVRAM index:", DEFAULT_NV);
+        printf("%-*s ", FIELD_WIDTH, "  PCRs:"); print_yaml_pcrs(DEFAULT_PCRS); printf("\n");
+        printf("%-*s ", FIELD_WIDTH, "  PCR banks:"); print_yaml_banks(DEFAULT_BANKS); printf("\n");
+
         break;
     case CMD_RESEAL:
         rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context, &keyBlob, &keyBlob_size);

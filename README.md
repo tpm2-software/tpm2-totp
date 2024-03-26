@@ -76,9 +76,11 @@ PCRs `0,2,4` and banks `SHA1, SHA256`.
 tpm2-totp init
 
 tpm2-totp -P - init
-verysecret<CTRL-D>
+> verysecret<CTRL-D>
+
 # or (recommended)
 gpg --decrypt /path/to/password.gpg | tpm2-totp -P - init
+
 # or (discouraged)
 tpm2-totp -P verysecret init
 
@@ -106,6 +108,14 @@ tpm2-totp -P - reseal
 tpm2-totp -P - -p 1,3,5,6 reseal
 ```
 
+## Status
+Check enrollment status:
+```
+tpm2-totp status
+```
+Tip: try piping the output to e.g. `bat -l yaml -pp` for nice syntax
+highlighting or to `yq` for YAML processing.
+
 ## Deletion
 In order to delete the created NV index:
 ```
@@ -120,6 +130,7 @@ tpm2-totp -N 0x01800001 -P - init
 tpm2-totp -N 0x01800001 show
 tpm2-totp -N 0x01800001 -P - recover
 tpm2-totp -N 0x01800001 -P - reseal
+tpm2-totp -N 0x01800001 status
 ```
 
 # Limitations
