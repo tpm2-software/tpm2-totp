@@ -453,7 +453,7 @@ main(int argc, char **argv)
                            &now_local);
             chkrc(rc, goto err);
         }
-        printf("%s%06" PRIu64, timestr, totp);
+        printf("%s%06" PRIu64 "\n", timestr, totp);
         break;
     case CMD_RESEAL:
         rc = tpm2totp_loadKey_nv(opt.nvindex, tcti_context, &keyBlob, &keyBlob_size);
