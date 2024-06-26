@@ -37,6 +37,7 @@ char *help =
     "    -h, --help      print help\n"
     "    -b, --banks     Selected PCR banks (default: SHA1,SHA256)\n"
     "    -l, --label     Label to use for display in the TOTP authenticator app (default: TPM2-TOTP)\n"
+    "    -s, --secret    Specify a custom secret instead of randomly generationg one\n"
     "    -N, --nvindex   TPM NV index to store data (default: 0x018094AF)\n"
     "    -P, --password  Password for recovery/resealing (default: None). Read from stdin if '-' (recommended).\n"
     "    -p, --pcrs      Selected PCR registers (default: 0,2,4,6)\n"
@@ -45,7 +46,7 @@ char *help =
     "    -v, --verbose   print verbose messages\n"
     "\n";
 
-static const char *optstr = "hb:N:P:p:tT:l:v";
+static const char *optstr = "hb:N:P:p:tT:l:s:v";
 
 static const struct option long_options[] = {
     {"help",     no_argument,       0, 'h'},
@@ -56,6 +57,7 @@ static const struct option long_options[] = {
     {"time",     no_argument,       0, 't'},
     {"tcti",     required_argument, 0, 'T'},
     {"label",    required_argument, 0, 'l'},
+    {"secret",   required_argument, 0, 's'},
     {"verbose",  no_argument,       0, 'v'},
     {0,          0,                 0,  0 }
 };
@@ -69,6 +71,7 @@ static struct opt {
     int time;
     char *tcti;
     char *label;
+    char *secret;
     int verbose;
 } opt;
 
@@ -182,6 +185,7 @@ parse_opts(int argc, char **argv)
     opt.time = 0;
     opt.verbose = 0;
     opt.label = "TPM2-TOTP";
+    opt.secret = 0;
 
     /* parse the options */
     int c;
@@ -251,6 +255,9 @@ parse_opts(int argc, char **argv)
         case 'l':
             opt.label = optarg;
             break;
+        case 's':
+            opt.secret = optarg;
+            break;
         case 'v':
             opt.verbose = 1;
             break;
@@ -294,7 +301,7 @@ parse_opts(int argc, char **argv)
 
 static char *
 base32enc(const uint8_t *in, size_t in_size) {
-	static unsigned char base32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    static unsigned char base32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
     size_t i = 0, j = 0;
     size_t out_size = ((in_size + 4) / 5) * 8;
@@ -326,7 +333,44 @@ base32enc(const uint8_t *in, size_t in_size) {
         r[i++] = '=';
     }
     r[i] = 0;
-	return (char *)r;
+    return (char *)r;
+}
+
+int
+base32dec(const char *in, uint8_t **out, size_t *out_size) {
+    size_t in_len = strlen(in);
+    if (in_len % 8 != 0) {
+        fprintf(stderr, "Error: Invalid base32 length.\n");
+        return -1;
+    }
+    *out = malloc((in_len * 5) / 8);
+    *out = memset(*out, 0, (in_len * 5) / 8);
+    if (*out == NULL) return -1;
+    size_t i=0, j=0;
+    uint64_t data_block = 0;
+    uint8_t padding_bits = 0;
+    *out_size = 0;
+    // read 40 bit block
+    for (i = 0; in[i] != '\0'; i++) {
+        char c = in[i];
+        uint64_t v = 0;
+        if (c >= 'A' && c <= 'Z') v = c - 'A';
+        if (c >= '2' && c <= '7') v = c - '2' + 26;
+        if (c == '=') padding_bits += 5;
+        data_block |= ((v<<(64-5)) >> (5 * (i%8)));
+
+        if (i%8 == 7) {
+            // we got a full block
+            for (j = *out_size; j<*out_size+5; j++) {
+                if ((j%5+1)*8 + padding_bits > 5*8)
+                    break;
+                (*out)[j] = (data_block >> (64-8*(j%5+1))) & 0xFF;
+            }
+            *out_size = j;
+            data_block = 0;
+        }
+    }
+    return 0;
 }
 
 char *
@@ -406,7 +450,7 @@ int
 main(int argc, char **argv)
 {
     int rc;
-    uint8_t *secret, *keyBlob, *newBlob;
+    uint8_t *secret = NULL, *keyBlob, *newBlob;
     size_t secret_size, keyBlob_size, newBlob_size;
     uint64_t totp;
     time_t now;
@@ -426,6 +470,9 @@ main(int argc, char **argv)
 
     switch(opt.cmd) {
     case CMD_INIT:
+        if (opt.secret) {
+            if (base32dec(opt.secret, &secret, &secret_size) != 0) goto err;
+        }
 
         rc = tpm2totp_generateKey(opt.pcrs, opt.banks, opt.password, tcti_context,
                                   &secret, &secret_size,
@@ -436,7 +483,7 @@ main(int argc, char **argv)
         free(keyBlob);
         chkrc(rc, goto err);
 
-	if (tpm2totp_qrencode(opt.label, secret, secret_size) < 0)
+        if (tpm2totp_qrencode(opt.label, secret, secret_size) < 0)
             goto err;
 
         break;
@@ -483,7 +530,7 @@ main(int argc, char **argv)
         free(keyBlob);
         chkrc(rc, goto err);
 
-	if (tpm2totp_qrencode(opt.label, secret, secret_size) < 0)
+        if (tpm2totp_qrencode(opt.label, secret, secret_size) < 0)
             goto err;
 
         break;
