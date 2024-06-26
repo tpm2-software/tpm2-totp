@@ -24,7 +24,7 @@ options.
 
   * `init`:
     Generate and store a new TOTP secret.
-    Possible options: `-b`, `-l`, `-N`, `-p`, `-P`, `-T`
+    Possible options: `-b`, `-l`, `-N`, `-p`, `-P`, `-T`, `-s`
 
   * `show`:
     Calculate and show a TOTP value.
@@ -52,6 +52,9 @@ options.
 
   * `-l`, `--label`:
     Label to use for display in the TOTP authenticator app (default: TPM2-TOTP)
+
+  * `-s`, `--secret`:
+    Specify a custom secret instead of randomly generationg one
 
   * `-N <nvindex>`, `--nvindex <nvindex>`:
     TPM NV index to store data (default: 0x018094AF)

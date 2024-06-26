@@ -167,28 +167,30 @@ tpm2totp_generateKey(uint32_t pcrs, uint32_t banks, const char *password,
         pcrsel.pcrSelections[i].pcrSelect[2] = pcrs >>16 & 0xff;
     }
 
-    *secret_size = 0;
-    *secret = malloc(SECRETLEN);
-    if (!*secret) {
-        return -1;
-    }
-
     rc = Esys_Initialize(&ctx, tcti_context, NULL);
     chkrc(rc, goto error);
 
     rc = Esys_Startup(ctx, TPM2_SU_CLEAR);
     if (rc != TPM2_RC_INITIALIZE) chkrc(rc, goto error);
 
-    while (*secret_size < SECRETLEN) {
-        dbg("Calling Esys_GetRandom for %zu bytes", SECRETLEN - *secret_size);
-        rc = Esys_GetRandom(ctx,
-                            ESYS_TR_NONE, ESYS_TR_NONE, ESYS_TR_NONE,
-                            SECRETLEN - *secret_size, &t);
-        chkrc(rc, goto error);
+    if (!*secret) {
+        // generate random secret if not already set from caller
+        *secret_size = 0;
+        *secret = malloc(SECRETLEN);
+        if (!*secret) {
+            return -1;
+        }
+        while (*secret_size < SECRETLEN) {
+            dbg("Calling Esys_GetRandom for %zu bytes", SECRETLEN - *secret_size);
+            rc = Esys_GetRandom(ctx,
+                                ESYS_TR_NONE, ESYS_TR_NONE, ESYS_TR_NONE,
+                                SECRETLEN - *secret_size, &t);
+            chkrc(rc, goto error);
 
-        memcpy(&(*secret)[*secret_size], &t->buffer[0], t->size);
-        *secret_size += t->size;
-        free(t);
+            memcpy(&(*secret)[*secret_size], &t->buffer[0], t->size);
+            *secret_size += t->size;
+            free(t);
+        }
     }
 
     dbg("Calling Esys_CreatePrimary");
@@ -304,7 +306,8 @@ error:
     free(keyPublicSeal);
     free(keyPrivateSeal);
     Esys_Finalize(&ctx);
-    free(*secret);
+    if (*secret)
+        free(*secret);
     *secret = NULL;
     *secret_size = 0;
     return (rc)? (int)rc : -1;
